@@ -68,3 +68,9 @@ fastlane/readme.md
 
 # pdf files
 *.pdf
+
+# Images
+Images/*
+
+# Odt files
+*.odt
