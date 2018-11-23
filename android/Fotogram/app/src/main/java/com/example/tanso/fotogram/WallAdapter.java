@@ -1,22 +1,30 @@
 package com.example.tanso.fotogram;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.tanso.fotogram.Model.Post;
+
+import java.util.HashMap;
 import java.util.List;
 
 class WallAdapter extends ArrayAdapter<Post> {
 
+    private HashMap<Integer,Bitmap> cache;
+
     public WallAdapter(Context context, int
             resource, List<Post> items) {
         super(context, resource, items);
+        cache = new HashMap<Integer, Bitmap>();
+        new ImageLoaderTask(items, cache, context).execute();
     }
 
     @Override
@@ -29,17 +37,98 @@ class WallAdapter extends ArrayAdapter<Post> {
         }
         Post p = getItem(position);
         if (p != null) {
+
+            //Profile picture and Image
+            /*
+            ImageView profilePicture = v.findViewById(R.id.wallPostProfilePic);
+            //Bitmap pic = BitmapFactory.decodeResource(v.getResources(), p.getUser().getProfilePicture());
+            profilePicture.setImageBitmap(cache.get(p.getUser().getProfilePicture()));
+            //profilePicture.setImageResource(p.getUser().getProfilePicture());
+            ImageView image = v.findViewById(R.id.wallPostImage);
+            //pic = BitmapFactory.decodeResource(v.getResources(), p.getImage());
+            image.setImageBitmap(cache.get(p.getImage()));
+            //image.setImageResource(p.getImage());
+            */
+            new GetViewTask(cache,v,p).execute();
+
+            //Username, description and date
             TextView username = v.findViewById(R.id.wallPostUsername);
             username.setText(p.getUser().getUsername());
-            ImageView profilePicture = v.findViewById(R.id.wallPostProfilePic);
-            profilePicture.setImageResource(p.getUser().getProfilePicture());
-            ImageView image = v.findViewById(R.id.wallPostImage);
-            image.setImageResource(p.getImage());
             TextView description = v.findViewById(R.id.wallPostDescription);
             description.setText(p.getDescription());
             TextView date = v.findViewById(R.id.wallPostDate);
-            date.setText(p.getDate());
+            date.setText(p.getTimestamp().toString());
         }
         return v;
+    }
+}
+
+class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
+
+    private List<Post> items;
+    private HashMap<Integer,Bitmap> cache;
+    private Context context;
+
+    public ImageLoaderTask(List<Post> items, HashMap<Integer,Bitmap> cache, Context context){
+        this.items = items;
+        this.cache = cache;
+        this.context = context;
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+        for(Post p: items){
+            cache.put(p.getImage(),BitmapFactory.decodeResource(context.getResources(),p.getImage()));
+            cache.put(p.getUser().getProfilePicture(),BitmapFactory.decodeResource(context.getResources(),p.getUser().getProfilePicture()));
+        }
+        return null;
+    }
+}
+
+class GetViewTask extends AsyncTask<Void,Void,Bitmap[]>{
+
+    private HashMap<Integer,Bitmap> cache;
+    private View v;
+    private Post p;
+
+    public GetViewTask(HashMap<Integer, Bitmap> cache, View v, Post p) {
+        this.cache = cache;
+        this.v = v;
+        this.p = p;
+    }
+
+    @Override
+    protected Bitmap[] doInBackground(Void... voids) {
+        Bitmap bitmaps[] = new Bitmap[]{null,null};
+
+        bitmaps[0] = cache.get(p.getUser().getProfilePicture());
+        while(bitmaps[0]==null) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            bitmaps[0] = cache.get(p.getUser().getProfilePicture());
+        }
+
+        bitmaps[1] = cache.get(p.getImage());
+        while(bitmaps[1]==null) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            bitmaps[1] = cache.get(p.getImage());
+        }
+
+        return bitmaps;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap[] bitmaps) {
+        ImageView profilePicture = v.findViewById(R.id.wallPostProfilePic);
+        ImageView image = v.findViewById(R.id.wallPostImage);
+        profilePicture.setImageBitmap(bitmaps[0]);
+        image.setImageBitmap(bitmaps[1]);
     }
 }

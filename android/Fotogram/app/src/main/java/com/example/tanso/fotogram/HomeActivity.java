@@ -1,15 +1,11 @@
 package com.example.tanso.fotogram;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.tanso.fotogram.Model.Model;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -27,13 +23,9 @@ public class HomeActivity extends AppCompatActivity {
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
 
         //Listview
-        List<Post> wall = new ArrayList<Post>();
-        wall.add(new Post(new User("froggo",R.drawable.rana_s),R.drawable.aurora_boreale, "Che bella l'aurora boreale!", "3 hours ago"));
-        wall.add(new Post(new User("doggo",R.drawable.cane_s),R.drawable.palazzi_m, "Auuuuuuu", "yesterday"));
-        wall.add(new Post(new User("froggo",R.drawable.rana_s),R.drawable.palloncini_m, "Cra Cra palloncini", "3 days ago"));
-
+        Model model = Model.getInstance();
         ListView lv = findViewById(R.id.wall);
-        WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, wall);
+        WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, model.getHomeWall());
         lv.setAdapter(adapter);
 
     }

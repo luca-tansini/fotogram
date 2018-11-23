@@ -16,6 +16,7 @@ public class UploadActivity extends AppCompatActivity {
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitle("Create post - choose a picture");
+        myToolbar.setTitleTextAppearance(this,R.style.upload_toolbar_text);
 
         BottomNavigationView nav = findViewById(R.id.navigation);
         nav.setSelectedItemId(R.id.navigation_upload);

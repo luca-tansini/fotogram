@@ -6,4 +6,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_upload">Upload</string>
+    <string name="shared_preferences_filename">SHARED_PREFS</string>
+    <string name="title_search_user">Search User</string>
+    <string name="title_my_profile">My Profile</string>
 </resources>

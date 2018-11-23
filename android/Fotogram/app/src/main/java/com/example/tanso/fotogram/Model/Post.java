@@ -1,16 +1,19 @@
-package com.example.tanso.fotogram;
+package com.example.tanso.fotogram.Model;
 
-class Post {
+import java.sql.Timestamp;
+
+public class Post {
 
     private User user;
-    private String date,description;
+    private Timestamp timestamp;
+    private String description;
     private int image;
 
-    Post(User user, int image, String description, String date) {
+    public Post(User user, int image, String description, Timestamp timestamp) {
         this.user = user;
         this.image = image;
         this.description = description;
-        this.date = date.toUpperCase();
+        this.timestamp = timestamp;
     }
 
     public User getUser() {
@@ -21,11 +24,12 @@ class Post {
         return image;
     }
 
-    public String getDate() {
-        return date;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
     public String getDescription() {
         return description;
     }
+
 }

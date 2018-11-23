@@ -1,3 +1,7 @@
 <resources>
+    <style name="upload_toolbar_text">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 
 </resources>

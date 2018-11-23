@@ -1,6 +1,6 @@
-package com.example.tanso.fotogram;
+package com.example.tanso.fotogram.Model;
 
-class User {
+public class User {
 
     private String username;
     private int profilePicture;
