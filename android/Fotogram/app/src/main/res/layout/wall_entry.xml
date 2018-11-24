@@ -43,7 +43,7 @@
         android:layout_marginStart="5dp"
         android:text="Descrizione molto profonda"
         android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/wallPostDate"
@@ -53,6 +53,6 @@
         android:layout_marginBottom="2dp"
         android:text="4 HOURS AGO"
         android:textColor="@android:color/darker_gray"
-        android:textSize="12sp" />
+        android:textSize="10sp" />
 
 </LinearLayout>

@@ -35,9 +35,19 @@ public class MyNavigationItemSelectedListener implements BottomNavigationView.On
                 return true;
 
             case R.id.navigation_search_user:
+                if(context.getClass().equals(SearchUserActivity.class))
+                    return true;
+                Intent search = new Intent(context, SearchUserActivity.class);
+                search.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                context.startActivity(search);
                 return true;
 
             case R.id.navigation_my_profile:
+                if(context.getClass().equals(MyProfileActivity.class))
+                    return true;
+                Intent myprofile = new Intent(context, MyProfileActivity.class);
+                myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                context.startActivity(myprofile);
                 return true;
 
         }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,11 +46,12 @@ public class LoginActivity extends AppCompatActivity {
     private void startHome(String sessionId, String username){
 
         //CHIAMATE REST A PROFILE E WALL PER OTTENERE IMMAGINE DEL PROFILO, HOMEWALL E LOGGEDUSERWALL
-
         int profilePicture = R.drawable.cavallo_xs;
         List<User> following = new ArrayList<User>();
         User froggo = new User("froggo",R.drawable.rana_xs);
         User doggo  = new User("doggo",R.drawable.cane_xs);
+        following.add(froggo);
+        following.add(doggo);
 
         LoggedUser loggedUser = new LoggedUser(username, profilePicture, sessionId, following);
 
@@ -60,9 +62,9 @@ public class LoginActivity extends AppCompatActivity {
         List<Post> homeWall = new ArrayList<Post>();
         homeWall.add(new Post(froggo,R.drawable.rana_xs, "#FreePepe", Timestamp.valueOf("2018-11-23 12:23:00")));
         homeWall.add(mypost);
-        homeWall.add(new Post(froggo,R.drawable.arance_xs, "Orange is the new black", Timestamp.valueOf("2018-11-23 9:03:00")));
+        homeWall.add(new Post(froggo,R.drawable.chitarra_xs, "Guitar", Timestamp.valueOf("2018-11-23 9:03:00")));
         homeWall.add(new Post(doggo,R.drawable.pastry_xs, "#food #sweets", Timestamp.valueOf("2018-11-22 21:37:00")));
-        homeWall.add(new Post(froggo,R.drawable.palloncini_xs, "Palloncini e palazzi", Timestamp.valueOf("2018-11-20 16:59:00")));
+        homeWall.add(new Post(froggo,R.drawable.palloncini_xs, "Palloncini", Timestamp.valueOf("2018-11-20 16:59:00")));
         homeWall.add(new Post(doggo,R.drawable.cane_xs, "#me #selfie", Timestamp.valueOf("2018-11-15 11:42:00")));
 
         //CREAZIONE DEL MODEL
@@ -100,4 +102,9 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        this.finishAffinity();
+    }
 }

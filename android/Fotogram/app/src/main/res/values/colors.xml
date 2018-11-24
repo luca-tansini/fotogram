@@ -5,4 +5,6 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorEnabled">@android:color/black</color>
     <color name="colorDisabled">@android:color/darker_gray</color>
+    <color name="colorFollow">@android:color/holo_blue_light</color>
+    <color name="colorUnfollow">@android:color/holo_red_dark</color>
 </resources>

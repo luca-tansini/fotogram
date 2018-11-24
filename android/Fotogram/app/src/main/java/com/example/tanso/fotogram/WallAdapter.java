@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import com.example.tanso.fotogram.Model.Post;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,10 +60,35 @@ class WallAdapter extends ArrayAdapter<Post> {
             TextView description = v.findViewById(R.id.wallPostDescription);
             description.setText(p.getDescription());
             TextView date = v.findViewById(R.id.wallPostDate);
-            date.setText(p.getTimestamp().toString());
+            date.setText(getDateString(p.getTimestamp()));
         }
         return v;
     }
+
+    private String getDateString(Timestamp t){
+        long diff = new Date().getTime() - t.getTime();
+        long days = diff / (86400*1000);
+        if(days<=7) {
+            if (days >= 1) {
+                if (days == 1) return "YESTERDAY";
+                return days + " DAYS AGO";
+            }
+            long hours = diff / (3600 * 1000);
+            if (hours >= 1) {
+                if (hours == 1) return "AN HOUR AGO";
+                return hours + " HOURS AGO";
+            }
+            long minutes = diff / (60 * 1000);
+            if (minutes >= 1) {
+                if (minutes == 1) return "A MINUTE AGO";
+                return minutes + " MINUTES AGO";
+            }
+            return "MOMENTS AGO";
+        }
+        return new SimpleDateFormat("dd MMMM yyyy").format(new Date(t.getTime())).toUpperCase();
+    }
+
+
 }
 
 class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
