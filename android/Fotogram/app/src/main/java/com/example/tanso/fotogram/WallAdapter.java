@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,7 @@ class WallAdapter extends ArrayAdapter<Post> {
             image.setImageBitmap(cache.get(p.getImage()));
             //image.setImageResource(p.getImage());
             */
-            new GetViewTask(cache,v,p).execute();
+            new GetViewTask(cache,v,p,getContext()).execute();
 
             //Username, description and date
             TextView username = v.findViewById(R.id.wallPostUsername);
@@ -115,14 +116,16 @@ class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
 
 class GetViewTask extends AsyncTask<Void,Void,Bitmap[]>{
 
+    private Context context;
     private HashMap<Integer,Bitmap> cache;
     private View v;
     private Post p;
 
-    public GetViewTask(HashMap<Integer, Bitmap> cache, View v, Post p) {
+    public GetViewTask(HashMap<Integer, Bitmap> cache, View v, Post p, Context context) {
         this.cache = cache;
         this.v = v;
         this.p = p;
+        this.context = context;
     }
 
     @Override
@@ -156,7 +159,8 @@ class GetViewTask extends AsyncTask<Void,Void,Bitmap[]>{
     protected void onPostExecute(Bitmap[] bitmaps) {
         ImageView profilePicture = v.findViewById(R.id.wallPostProfilePic);
         ImageView image = v.findViewById(R.id.wallPostImage);
-        profilePicture.setImageBitmap(bitmaps[0]);
+        RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(context,bitmaps[0]);
+        profilePicture.setImageDrawable(rbd);
         image.setImageBitmap(bitmaps[1]);
     }
 }

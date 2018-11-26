@@ -1,6 +1,7 @@
 package com.example.tanso.fotogram;
 
 import android.content.Intent;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -46,7 +47,8 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView textViewusername = findViewById(R.id.textViewUsername);
         textViewusername.setText(username);
         ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
-        imageViewProfilePicture.setImageResource(u.getProfilePicture());
+        RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(getApplicationContext(),u.getProfilePicture());
+        imageViewProfilePicture.setImageDrawable(rbd);
         Button buttonFollow = findViewById(R.id.buttonFollow);
         if(model.getLoggedUser().getFollowing().contains(u)){
             buttonFollow.setText("UNFOLLOW");

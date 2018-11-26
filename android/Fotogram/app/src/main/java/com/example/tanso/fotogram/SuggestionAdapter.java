@@ -1,6 +1,7 @@
 package com.example.tanso.fotogram;
 
 import android.content.Context;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,8 @@ class SuggestionAdapter extends ArrayAdapter<User> {
         User u = getItem(position);
         if (u != null) {
             ImageView profilePicture = v.findViewById(R.id.suggestionProfilePic);
-            profilePicture.setImageResource(u.getProfilePicture());
+            RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(getContext(),u.getProfilePicture());
+            profilePicture.setImageDrawable(rbd);
             TextView suggestionUsername = v.findViewById(R.id.suggestionUsername);
             suggestionUsername.setText(u.getUsername());
         }
