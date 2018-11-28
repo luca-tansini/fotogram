@@ -69,7 +69,8 @@ public class UploadActivity extends AppCompatActivity {
                 ImageView iw = findViewById(R.id.imageViewUpload);
                 iw.setImageBitmap(bitmap);
                 Toolbar toolbar = findViewById(R.id.my_toolbar);
-                toolbar.inflateMenu(R.menu.action_bar);
+                if(toolbar.getMenu().size() == 0)
+                    toolbar.inflateMenu(R.menu.action_bar);
             } catch (Exception e) {
                 e.printStackTrace();
             }
