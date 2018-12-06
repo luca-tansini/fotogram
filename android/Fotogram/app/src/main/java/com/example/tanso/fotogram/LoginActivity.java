@@ -85,15 +85,12 @@ public class LoginActivity extends AppCompatActivity {
     private void login(){
         EditText usernameET = findViewById(R.id.editTextUsername);
         EditText passwordET = findViewById(R.id.editTextPassword);
+        TextView error = findViewById(R.id.textViewError);
+        error.setText("");
 
         String usr,pass;
         usr = usernameET.getText().toString();
         pass = passwordET.getText().toString();
-
-        if(usr.equals("") || pass.equals("")){
-            //TOAST RIEMPI I CAMPI!
-            return;
-        }
 
         if(usr.equals("bojack") && pass.equals("horseman")){
             //LOGIN CORRETTO
@@ -106,8 +103,8 @@ public class LoginActivity extends AppCompatActivity {
             startHome(sessionId, usr);
         }
 
-        //LOGIN ERRATO, TOAST
 
+        error.setText("invalid username or password");
     }
 
 
