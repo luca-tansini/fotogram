@@ -24,7 +24,8 @@
             android:label="Create post - choose a picture" />
         <activity android:name=".MyProfileActivity" />
         <activity android:name=".SearchUserActivity" />
-        <activity android:name=".UserProfileActivity"></activity>
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".InsertDescriptionActivity"></activity>
     </application>
 
 </manifest>
