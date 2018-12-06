@@ -7,10 +7,14 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,6 +47,7 @@ public class InsertDescriptionActivity extends AppCompatActivity {
 
         //Make post button
         Button upload = findViewById(R.id.buttonCreatePost);
+        upload.setEnabled(false);
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,11 +55,15 @@ public class InsertDescriptionActivity extends AppCompatActivity {
             }
         });
 
+        //Set editText listener
+        EditText tv = findViewById(R.id.editTextDescription);
+        tv.addTextChangedListener(new ButtonEnableTextWatcher(upload));
+
     }
 
     private void makePost(){
         //TODO: fare vera chiamata REST
-        TextView tv = findViewById(R.id.editTextDescription);
+        EditText tv = findViewById(R.id.editTextDescription);
         String description = tv.getText().toString();
         Model model = Model.getInstance();
         //model.getHomeWall().add(new Post(model.getLoggedUser(), bitmap, description));

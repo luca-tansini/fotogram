@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
@@ -33,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_login);
+
+        //Set login form
         Button loginButton = findViewById(R.id.buttonLogin);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +43,11 @@ public class LoginActivity extends AppCompatActivity {
                 login();
             }
         });
+        loginButton.setEnabled(false);
+        EditText usernameET = findViewById(R.id.editTextUsername);
+        EditText passwordET = findViewById(R.id.editTextPassword);
+        usernameET.addTextChangedListener(new ButtonEnableTextWatcher(loginButton,passwordET));
+        passwordET.addTextChangedListener(new ButtonEnableTextWatcher(loginButton,usernameET));
 
     }
 
