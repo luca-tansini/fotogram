@@ -12,6 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
@@ -19,7 +25,9 @@ import com.example.tanso.fotogram.Model.User;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -113,25 +121,44 @@ public class LoginActivity extends AppCompatActivity {
     private void login(){
         EditText usernameET = findViewById(R.id.editTextUsername);
         EditText passwordET = findViewById(R.id.editTextPassword);
-
-        String usr,pass;
+        final String usr,pswd;
         usr = usernameET.getText().toString();
-        pass = passwordET.getText().toString();
+        pswd = passwordET.getText().toString();
 
-        if(usr.equals("bojack") && pass.equals("horseman")){
-            //LOGIN CORRETTO
-            String sessionId = "42";
-            SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("sessionId", sessionId);
-            editor.putString("username", usr);
-            editor.apply();
-            startHome(sessionId, usr);
-        }
-        else{
-            TextView error = findViewById(R.id.textViewError);
-            error.setText("invalid username or password");
-        }
+        //Volley POST request
+        RequestQueue rq = Volley.newRequestQueue(this);
+        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/login";
+        StringRequest sr = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String sid) {
+                        Log.d("ajeje", "sid: "+sid);
+                        SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString("sessionId", sid);
+                        editor.putString("username", usr);
+                        editor.apply();
+                        startHome(sid, usr);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ajeje", "volley error: "+error.toString());
+                        TextView errorTV = findViewById(R.id.textViewError);
+                        errorTV.setText("invalid username or password");
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("username",usr);
+                params.put("password",pswd);
+                return params;
+            }
+        };
+        rq.add(sr);
     }
 
 
