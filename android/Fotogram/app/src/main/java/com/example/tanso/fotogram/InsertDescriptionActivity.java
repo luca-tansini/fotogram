@@ -9,17 +9,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Display;
-import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.tanso.fotogram.Model.Model;
-import com.example.tanso.fotogram.Model.Post;
 
 public class InsertDescriptionActivity extends AppCompatActivity {
 
@@ -46,9 +41,9 @@ public class InsertDescriptionActivity extends AppCompatActivity {
         }
 
         //Make post button
-        Button upload = findViewById(R.id.buttonCreatePost);
-        upload.setEnabled(false);
-        upload.setOnClickListener(new View.OnClickListener() {
+        final Button uploadButton = findViewById(R.id.buttonCreatePost);
+        uploadButton.setEnabled(false);
+        uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 makePost();
@@ -57,7 +52,19 @@ public class InsertDescriptionActivity extends AppCompatActivity {
 
         //Set editText listener
         EditText tv = findViewById(R.id.editTextDescription);
-        tv.addTextChangedListener(new ButtonEnableTextWatcher(upload));
+        tv.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().equals(""))
+                    uploadButton.setEnabled(false);
+                else
+                    uploadButton.setEnabled(true);
+            }
+        });
 
     }
 

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Is the user logged in already?
+        //Has the user logged in already?
         SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
         String sessionId = settings.getString("sessionId", "");
         String username = settings.getString("username", "");
@@ -36,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //Set login form
-        Button loginButton = findViewById(R.id.buttonLogin);
+        final Button loginButton = findViewById(R.id.buttonLogin);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,11 +46,37 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         loginButton.setEnabled(false);
-        EditText usernameET = findViewById(R.id.editTextUsername);
-        EditText passwordET = findViewById(R.id.editTextPassword);
-        usernameET.addTextChangedListener(new ButtonEnableTextWatcher(loginButton,passwordET));
-        passwordET.addTextChangedListener(new ButtonEnableTextWatcher(loginButton,usernameET));
-
+        final TextView error = findViewById(R.id.textViewError);
+        final EditText usernameET = findViewById(R.id.editTextUsername);
+        final EditText passwordET = findViewById(R.id.editTextPassword);
+        usernameET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().length() > 0 && passwordET.getText().length() > 0)
+                    loginButton.setEnabled(true);
+                else
+                    loginButton.setEnabled(false);
+                error.setText("");
+            }
+        });
+        passwordET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().length() > 0 && usernameET.getText().length() > 0)
+                    loginButton.setEnabled(true);
+                else
+                    loginButton.setEnabled(false);
+                error.setText("");
+            }
+        });
     }
 
     private void startHome(String sessionId, String username){
@@ -85,8 +113,6 @@ public class LoginActivity extends AppCompatActivity {
     private void login(){
         EditText usernameET = findViewById(R.id.editTextUsername);
         EditText passwordET = findViewById(R.id.editTextPassword);
-        TextView error = findViewById(R.id.textViewError);
-        error.setText("");
 
         String usr,pass;
         usr = usernameET.getText().toString();
@@ -99,12 +125,13 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = settings.edit();
             editor.putString("sessionId", sessionId);
             editor.putString("username", usr);
-            editor.commit();
+            editor.apply();
             startHome(sessionId, usr);
         }
-
-
-        error.setText("invalid username or password");
+        else{
+            TextView error = findViewById(R.id.textViewError);
+            error.setText("invalid username or password");
+        }
     }
 
 
