@@ -8,10 +8,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.io.ByteArrayOutputStream;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -68,6 +72,14 @@ public class UploadActivity extends AppCompatActivity {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
                 ImageView iv = findViewById(R.id.imageViewUpload);
                 iv.setImageBitmap(bitmap);
+                //PROVA DI ENCODING BASE64
+                /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] imgBytes = stream.toByteArray();
+                stream.close();
+                String encodedImg = Base64.encodeToString(imgBytes, 0, imgBytes.length, Base64.DEFAULT);
+                Log.d("ajeje", "len: "+encodedImg.length());
+                Log.d("ajeje", encodedImg);*/
                 Toolbar toolbar = findViewById(R.id.my_toolbar);
                 if(toolbar.getMenu().size() == 0)
                     toolbar.inflateMenu(R.menu.action_bar);

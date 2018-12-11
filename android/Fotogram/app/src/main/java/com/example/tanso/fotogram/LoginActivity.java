@@ -161,7 +161,6 @@ public class LoginActivity extends AppCompatActivity {
         rq.add(sr);
     }
 
-
     @Override
     public void onBackPressed() {
         this.finishAffinity();
