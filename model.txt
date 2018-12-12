@@ -1,0 +1,26 @@
+/*int profilePicture = R.drawable.cavallo_xs;
+        List<User> following = new ArrayList<User>();
+        User froggo = new User("froggo",R.drawable.rana_xs);
+        User doggo  = new User("doggo",R.drawable.cane_xs);
+        following.add(froggo);
+        following.add(doggo);
+
+        LoggedUser loggedUser = new LoggedUser(username, profilePicture, sessionId, following);
+
+        Post mypost = new Post(loggedUser, R.drawable.acqua_xs, "watercircles", Timestamp.valueOf("2018-11-23 11:11:00"));
+        List<Post> loggedUserWall = new ArrayList<Post>();
+        loggedUserWall.add(mypost);
+
+        List<Post> homeWall = new ArrayList<Post>();
+        homeWall.add(new Post(froggo,R.drawable.rana_xs, "#FreePepe", Timestamp.valueOf("2018-11-23 12:23:00")));
+        homeWall.add(mypost);
+        homeWall.add(new Post(froggo,R.drawable.chitarra_xs, "Guitar", Timestamp.valueOf("2018-11-23 9:03:00")));
+        homeWall.add(new Post(doggo,R.drawable.pastry_xs, "#food #sweets", Timestamp.valueOf("2018-11-22 21:37:00")));
+        homeWall.add(new Post(froggo,R.drawable.palloncini_xs, "Palloncini", Timestamp.valueOf("2018-11-20 16:59:00")));
+        homeWall.add(new Post(doggo,R.drawable.cane_xs, "#me #selfie", Timestamp.valueOf("2018-11-15 11:42:00")));
+
+        //CREAZIONE DEL MODEL
+        Model.buildInstance(loggedUser, homeWall, loggedUserWall);
+        Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+        startActivity(home);
+        finish();*/

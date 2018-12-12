@@ -3,9 +3,9 @@ package com.example.tanso.fotogram.Model;
 public class User {
 
     private String username;
-    private int profilePicture;
+    private String profilePicture;
 
-    public User(String username, int profilePicture) {
+    public User(String username, String profilePicture) {
         this.username = username;
         this.profilePicture = profilePicture;
     }
@@ -14,11 +14,11 @@ public class User {
         return username;
     }
 
-    public int getProfilePicture() {
+    public String getProfilePicture() {
         return profilePicture;
     }
 
-    public void updateProfilePicture(int newProfilePicture){
+    public void updateProfilePicture(String newProfilePicture){
         this.profilePicture = newProfilePicture;
     }
 

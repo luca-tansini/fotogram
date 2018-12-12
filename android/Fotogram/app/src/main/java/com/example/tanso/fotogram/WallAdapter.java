@@ -22,12 +22,12 @@ import java.util.List;
 
 class WallAdapter extends ArrayAdapter<Post> {
 
-    private HashMap<Integer,Bitmap> cache;
+    private HashMap<String,Bitmap> cache;
 
     public WallAdapter(Context context, int
             resource, List<Post> items) {
         super(context, resource, items);
-        cache = new HashMap<Integer, Bitmap>();
+        cache = new HashMap<String, Bitmap>();
         new ImageLoaderTask(items, cache, context).execute();
     }
 
@@ -95,10 +95,10 @@ class WallAdapter extends ArrayAdapter<Post> {
 class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
 
     private List<Post> items;
-    private HashMap<Integer,Bitmap> cache;
+    private HashMap<String,Bitmap> cache;
     private Context context;
 
-    public ImageLoaderTask(List<Post> items, HashMap<Integer,Bitmap> cache, Context context){
+    public ImageLoaderTask(List<Post> items, HashMap<String,Bitmap> cache, Context context){
         this.items = items;
         this.cache = cache;
         this.context = context;
@@ -107,8 +107,9 @@ class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
     @Override
     protected Void doInBackground(Void... voids) {
         for(Post p: items){
-            cache.put(p.getImage(),BitmapFactory.decodeResource(context.getResources(),p.getImage()));
-            cache.put(p.getUser().getProfilePicture(),BitmapFactory.decodeResource(context.getResources(),p.getUser().getProfilePicture()));
+            //TODO: creare classe Picture con metodo hash
+            cache.put(p.getImage().substring(0,16), Base64Images.base64toBitmap(p.getImage()));
+            cache.put(p.getUser().getProfilePicture().substring(0,16), Base64Images.base64toBitmap(p.getUser().getProfilePicture()));
         }
         return null;
     }
@@ -117,11 +118,11 @@ class ImageLoaderTask extends AsyncTask<Void,Void,Void>{
 class GetViewTask extends AsyncTask<Void,Void,Bitmap[]>{
 
     private Context context;
-    private HashMap<Integer,Bitmap> cache;
+    private HashMap<String,Bitmap> cache;
     private View v;
     private Post p;
 
-    public GetViewTask(HashMap<Integer, Bitmap> cache, View v, Post p, Context context) {
+    public GetViewTask(HashMap<String, Bitmap> cache, View v, Post p, Context context) {
         this.cache = cache;
         this.v = v;
         this.p = p;
@@ -132,24 +133,24 @@ class GetViewTask extends AsyncTask<Void,Void,Bitmap[]>{
     protected Bitmap[] doInBackground(Void... voids) {
         Bitmap bitmaps[] = new Bitmap[]{null,null};
 
-        bitmaps[0] = cache.get(p.getUser().getProfilePicture());
+        bitmaps[0] = cache.get(p.getUser().getProfilePicture().substring(0,16));
         while(bitmaps[0]==null) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            bitmaps[0] = cache.get(p.getUser().getProfilePicture());
+            bitmaps[0] = cache.get(p.getUser().getProfilePicture().substring(0,16));
         }
 
-        bitmaps[1] = cache.get(p.getImage());
+        bitmaps[1] = cache.get(p.getImage().substring(0,16));
         while(bitmaps[1]==null) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            bitmaps[1] = cache.get(p.getImage());
+            bitmaps[1] = cache.get(p.getImage().substring(0,16));
         }
 
         return bitmaps;

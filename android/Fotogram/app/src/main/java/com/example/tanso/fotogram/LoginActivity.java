@@ -1,12 +1,15 @@
 package com.example.tanso.fotogram;
 
+import android.app.DownloadManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.JsonReader;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +19,18 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
 import com.example.tanso.fotogram.Model.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -87,37 +96,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void startHome(String sessionId, String username){
-
-        //CHIAMATE REST A PROFILE E WALL PER OTTENERE IMMAGINE DEL PROFILO, HOMEWALL E LOGGEDUSERWALL
-        int profilePicture = R.drawable.cavallo_xs;
-        List<User> following = new ArrayList<User>();
-        User froggo = new User("froggo",R.drawable.rana_xs);
-        User doggo  = new User("doggo",R.drawable.cane_xs);
-        following.add(froggo);
-        following.add(doggo);
-
-        LoggedUser loggedUser = new LoggedUser(username, profilePicture, sessionId, following);
-
-        Post mypost = new Post(loggedUser, R.drawable.acqua_xs, "watercircles", Timestamp.valueOf("2018-11-23 11:11:00"));
-        List<Post> loggedUserWall = new ArrayList<Post>();
-        loggedUserWall.add(mypost);
-
-        List<Post> homeWall = new ArrayList<Post>();
-        homeWall.add(new Post(froggo,R.drawable.rana_xs, "#FreePepe", Timestamp.valueOf("2018-11-23 12:23:00")));
-        homeWall.add(mypost);
-        homeWall.add(new Post(froggo,R.drawable.chitarra_xs, "Guitar", Timestamp.valueOf("2018-11-23 9:03:00")));
-        homeWall.add(new Post(doggo,R.drawable.pastry_xs, "#food #sweets", Timestamp.valueOf("2018-11-22 21:37:00")));
-        homeWall.add(new Post(froggo,R.drawable.palloncini_xs, "Palloncini", Timestamp.valueOf("2018-11-20 16:59:00")));
-        homeWall.add(new Post(doggo,R.drawable.cane_xs, "#me #selfie", Timestamp.valueOf("2018-11-15 11:42:00")));
-
-        //CREAZIONE DEL MODEL
-        Model.buildInstance(loggedUser, homeWall, loggedUserWall);
-        Intent home = new Intent(getApplicationContext(), HomeActivity.class);
-        startActivity(home);
-        finish();
-    }
-
     private void login(){
         EditText usernameET = findViewById(R.id.editTextUsername);
         EditText passwordET = findViewById(R.id.editTextPassword);
@@ -126,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
         pswd = passwordET.getText().toString();
 
         //Volley POST request
-        RequestQueue rq = Volley.newRequestQueue(this);
+        RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/login";
         StringRequest sr = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -159,6 +137,62 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
         rq.add(sr);
+    }
+
+    private void startHome(final String sessionId, final String username){
+
+        RequestQueue rq = Model.getRequestQueue(this);
+        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/followed";
+        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("ajeje", response);
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            JSONArray jsonArray = obj.getJSONArray("followed");
+                            List<User> following = new ArrayList<User>();
+                            LoggedUser lu = null;
+                            for(int i=0; i<jsonArray.length(); i++) {
+                                JSONObject j = (JSONObject) jsonArray.get(i);
+                                //Logged user data
+                                if(j.get("name").equals(username))
+                                    lu = new LoggedUser(username, j.getString("picture"), sessionId, following);
+                                    //Other users data
+                                else
+                                    following.add(new User(j.getString("name"), j.getString("picture")));
+                            }
+                            if(lu != null) {
+                                Model model = Model.getInstance();
+                                model.setLoggedUser(lu);
+                                Log.d("ajeje", "Model.getInstance().getLoggedUser().getSessionId(): "+Model.getInstance().getLoggedUser().getSessionId());
+                                Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+                                startActivity(home);
+                                finish();
+                            }
+                            else{
+                                Log.d("ajeje", "logged user not found?!");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ajeje", error.networkResponse.toString());
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("session_id",sessionId);
+                return params;
+            }
+        };
+        rq.add(followedRequest);
     }
 
     @Override
