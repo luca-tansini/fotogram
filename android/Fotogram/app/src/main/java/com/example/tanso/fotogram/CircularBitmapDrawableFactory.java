@@ -20,5 +20,4 @@ public class CircularBitmapDrawableFactory {
         rbd.setCircular(true);
         return rbd;
     }
-
 }

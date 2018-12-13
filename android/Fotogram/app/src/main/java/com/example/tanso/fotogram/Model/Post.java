@@ -1,5 +1,7 @@
 package com.example.tanso.fotogram.Model;
 
+import android.graphics.Bitmap;
+
 import java.sql.Timestamp;
 
 //TODO:refactoring per usare GSON?
@@ -8,9 +10,9 @@ public class Post {
     private User user;
     private Timestamp timestamp;
     private String description;
-    private String image;
+    private Image image;
 
-    public Post(User user, String image, String description, Timestamp timestamp) {
+    public Post(User user, Image image, String description, Timestamp timestamp) {
         this.user = user;
         this.image = image;
         this.description = description;
@@ -21,7 +23,7 @@ public class Post {
         return user;
     }
 
-    public String getImage() {
+    public Image getImage() {
         return image;
     }
 

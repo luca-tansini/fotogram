@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -15,6 +14,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Model.Base64Images;
+import com.example.tanso.fotogram.Model.Image;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
@@ -38,6 +39,9 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Model model = Model.getInstance();
+        //Followed REST call
+        followedCall(model.getLoggedUser().getSessionId(), model.getLoggedUser().getUsername());
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
@@ -46,13 +50,65 @@ public class HomeActivity extends AppCompatActivity {
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
 
         //Wall REST call
+        wallCall();
+    }
+
+    private void followedCall(final String sessionId, final String username){
+
+        RequestQueue rq = Model.getRequestQueue(this);
+        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/followed";
+        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            JSONArray jsonArray = obj.getJSONArray("followed");
+                            List<User> following = new ArrayList<User>();
+                            for(int i=0; i<jsonArray.length(); i++) {
+                                JSONObject j = (JSONObject) jsonArray.get(i);
+                                //Logged user data
+                                if(j.get("name").equals(username)) {
+                                    if (!j.getString("picture").equals("null"))
+                                        Model.getInstance().getLoggedUser().updateProfilePicture(new Image(j.getString("picture")));
+                                    Model.getInstance().getLoggedUser().setFollowing(following);
+                                }//Other users data
+                                else {
+                                    if (!j.getString("picture").equals("null"))
+                                        following.add(new User(j.getString("name"), new Image(j.getString("picture"))));
+                                    else
+                                        following.add(new User(j.getString("name"), null));
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ajeje", "followed error: "+error.networkResponse.toString());
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("session_id",sessionId);
+                return params;
+            }
+        };
+        rq.add(followedRequest);
+    }
+
+    private void wallCall(){
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/wall";
         StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("ajeje", response);
                         try {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("posts");
@@ -62,12 +118,16 @@ public class HomeActivity extends AppCompatActivity {
                                 String usr = j.getString("user");
                                 for(User u: Model.getInstance().getLoggedUser().getFollowing()){
                                     if(u.getUsername().equals(usr))
-                                        wall.add(new Post(u, j.getString("img"), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                        if(!j.getString("picture").equals("null"))
+                                            wall.add(new Post(u, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                        else
+                                            wall.add(new Post(u, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                                     else
                                         Log.d("ajeje", "post owner not in following?");
                                 }
                             }
                             Model.getInstance().setHomeWall(wall);
+                            //Show wall
                             showWall();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -77,7 +137,7 @@ public class HomeActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", error.toString());
+                        Log.d("ajeje", "wall error: "+error.toString());
                     }
                 }
         ){
@@ -92,7 +152,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showWall(){
-        //Listview
+        //Set listview
         Model model = Model.getInstance();
         ListView lv = findViewById(R.id.wall);
         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, model.getHomeWall());

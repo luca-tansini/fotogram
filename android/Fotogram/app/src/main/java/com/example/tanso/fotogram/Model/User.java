@@ -1,11 +1,13 @@
 package com.example.tanso.fotogram.Model;
 
+import android.graphics.Bitmap;
+
 public class User {
 
     private String username;
-    private String profilePicture;
+    private Image profilePicture;
 
-    public User(String username, String profilePicture) {
+    public User(String username, Image profilePicture) {
         this.username = username;
         this.profilePicture = profilePicture;
     }
@@ -14,11 +16,11 @@ public class User {
         return username;
     }
 
-    public String getProfilePicture() {
+    public Image getProfilePicture() {
         return profilePicture;
     }
 
-    public void updateProfilePicture(String newProfilePicture){
+    public void updateProfilePicture(Image newProfilePicture){
         this.profilePicture = newProfilePicture;
     }
 

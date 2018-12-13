@@ -5,7 +5,6 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class Model {
@@ -15,7 +14,7 @@ public class Model {
 
     private LoggedUser loggedUser;
     private List<Post> homeWall;
-    private List<Post> loggedUserProfileWall;
+    private List<Post> loggedUserWall;
 
     private Model(){}
 
@@ -51,11 +50,11 @@ public class Model {
         this.homeWall = homeWall;
     }
 
-    public List<Post> getLoggedUserProfileWall() {
-        return loggedUserProfileWall;
+    public List<Post> getLoggedUserWall() {
+        return loggedUserWall;
     }
 
-    public void setLoggedUserProfileWall(List<Post> loggedUserProfileWall) {
-        this.loggedUserProfileWall = loggedUserProfileWall;
+    public void setLoggedUserWall(List<Post> loggedUserWall) {
+        this.loggedUserWall = loggedUserWall;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.tanso.fotogram;
+package com.example.tanso.fotogram.Model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

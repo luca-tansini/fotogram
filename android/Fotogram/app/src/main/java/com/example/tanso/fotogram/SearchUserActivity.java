@@ -16,10 +16,6 @@ public class SearchUserActivity extends AppCompatActivity {
 
     private MyNavigationItemSelectedListener myNavigationItemSelectedListener;
 
-    private static final String[] COUNTRIES = new String[] {
-            "Belgium", "France", "Italy", "Italia", "I tali", "Italiano", "italiani", "Itagliano", "Germany", "Spain"
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +40,6 @@ public class SearchUserActivity extends AppCompatActivity {
                 startActivity(userprofile);
             }
         });
-
     }
 
     @Override

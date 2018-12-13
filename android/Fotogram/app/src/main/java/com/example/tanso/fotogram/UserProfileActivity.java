@@ -42,7 +42,7 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView textViewusername = findViewById(R.id.textViewUsername);
         textViewusername.setText(username);
         ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
-        RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(getApplicationContext(),Base64Images.base64toBitmap(u.getProfilePicture()));
+        RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(getApplicationContext(), u.getProfilePicture().getBitmap());
         imageViewProfilePicture.setImageDrawable(rbd);
         Button buttonFollow = findViewById(R.id.buttonFollow);
         if(model.getLoggedUser().getFollowing().contains(u)){
@@ -58,6 +58,5 @@ public class UserProfileActivity extends AppCompatActivity {
         ListView lv = findViewById(R.id.userWall);
         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
         lv.setAdapter(adapter);
-
     }
 }
