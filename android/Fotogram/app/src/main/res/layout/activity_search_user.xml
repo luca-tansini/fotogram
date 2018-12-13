@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".SearchUserActivity">
 
-    <android.support.v7.widget.AppCompatAutoCompleteTextView
+    <EditText
         android:id="@+id/editTextSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,14 +21,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ListView
+        android:id="@+id/suggestionList"
+        android:layout_width="match_parent"
+        android:layout_height="245dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:fastScrollEnabled="true"
+        android:persistentDrawingCache="scrolling"
+        android:scrollingCache="false"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSearch"
+        app:layout_constraintVertical_bias="0.0"></ListView>
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:elevation="4dp"
         android:background="@android:color/white"
+        android:elevation="4dp"
         app:itemIconTint="@drawable/navigation_bar_color_selector"
         app:itemTextColor="@drawable/navigation_bar_color_selector"
         app:labelVisibilityMode="labeled"

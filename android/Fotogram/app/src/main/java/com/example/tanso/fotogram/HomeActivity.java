@@ -118,7 +118,7 @@ public class HomeActivity extends AppCompatActivity {
                                 String usr = j.getString("user");
                                 for(User u: Model.getInstance().getLoggedUser().getFollowing()){
                                     if(u.getUsername().equals(usr))
-                                        if(!j.getString("picture").equals("null"))
+                                        if(!j.getString("img").equals("null"))
                                             wall.add(new Post(u, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                                         else
                                             wall.add(new Post(u, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));

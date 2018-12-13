@@ -26,6 +26,7 @@ import com.example.tanso.fotogram.Model.Image;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
+import com.example.tanso.fotogram.Model.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,13 +58,6 @@ public class MyProfileActivity extends AppCompatActivity {
         TextView usernameTV = findViewById(R.id.textViewUsername);
         usernameTV.setText(user.getUsername());
 
-        //Profile picture
-        final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
-        if(user.getProfilePicture() != null)
-            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),user.getProfilePicture().getBitmap()));
-        else
-            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_full));
-
         //Logout button
         Button logoutButton = findViewById(R.id.buttonLogout);
         logoutButton.setOnClickListener(new View.OnClickListener(){
@@ -73,54 +67,62 @@ public class MyProfileActivity extends AppCompatActivity {
             }
         });
 
-        //User Wall
-        final ListView lv = findViewById(R.id.userWall);
+        //Setup User Wall
+        profileCall(user);
 
+    }
+
+    private void profileCall(final User user){
         //profile(user) REST call
+        final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
+        final ListView userWallLV = findViewById(R.id.userWall);
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/profile";
         StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            JSONArray jsonArray = obj.getJSONArray("posts");
-                            //Check if the user profile picture has changed
-                            String pic = obj.getString("picture");
-                            if(!pic.substring(0,16<=pic.length()? 16:pic.length()).equals(user.getProfilePicture().hash())){
-                                user.updateProfilePicture(new Image(pic));
-                                RoundedBitmapDrawable rbd = CircularBitmapDrawableFactory.create(getApplicationContext(), user.getProfilePicture().getBitmap());
-                                imageViewProfilePicture.setImageDrawable(rbd);
-                            }
-                            ArrayList<Post> userWall = new ArrayList<Post>();
-                            for(int i=0; i<jsonArray.length(); i++) {
-                                JSONObject j = (JSONObject) jsonArray.get(i);
-                                if(!j.getString("picture").equals("null"))
-                                    userWall.add(new Post(user, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
-                                else
-                                    userWall.add(new Post(user, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
-                            }
-                            Model.getInstance().setLoggedUserWall(userWall);
-                            WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
-                            lv.setAdapter(adapter);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        JSONArray jsonArray = obj.getJSONArray("posts");
+
+                        //Check if the user profile picture has changed
+                        String pic = obj.getString("img");
+                        if(!pic.substring(0,16<=pic.length()? 16:pic.length()).equals(user.getProfilePicture().hash()))
+                            user.updateProfilePicture(new Image(pic));
+                        if(user.getProfilePicture() != null && user.getProfilePicture().getBitmap() != null)
+                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),user.getProfilePicture().getBitmap()));
+                        else
+                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_full));
+
+                        ArrayList<Post> userWall = new ArrayList<Post>();
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject j = (JSONObject) jsonArray.get(i);
+                            if(!j.getString("img").equals("null"))
+                                userWall.add(new Post(user, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                            else
+                                userWall.add(new Post(user, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "profile(logged user) error: "+error.toString());
+                        Model.getInstance().setLoggedUserWall(userWall);
+                        WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
+                        userWallLV.setAdapter(adapter);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("ajeje", "profile(logged user) error: "+error.toString());
+                }
+            }
         ){
             @Override
             protected Map<String, String> getParams() {
                 HashMap<String,String> params = new HashMap<>();
                 params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
-                params.put("username", Model.getInstance().getLoggedUser().getUsername());
+                params.put("username", user.getUsername());
                 return params;
             }
         };
@@ -138,25 +140,25 @@ public class MyProfileActivity extends AppCompatActivity {
         RequestQueue rq = Volley.newRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/logout";
         StringRequest sr = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Model.destroyInstance();
-                        SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.remove("sessionId");
-                        editor.remove("username");
-                        editor.commit();
-                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                        finishAffinity();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "error during logout!");
-                    }
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Model.destroyInstance();
+                    SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.remove("sessionId");
+                    editor.remove("username");
+                    editor.commit();
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    finishAffinity();
                 }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("ajeje", "error during logout!");
+                }
+            }
         ){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -167,5 +169,4 @@ public class MyProfileActivity extends AppCompatActivity {
         };
         rq.add(sr);
     }
-
 }

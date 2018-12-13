@@ -25,9 +25,13 @@
             android:name=".UploadActivity"
             android:label="Create post - choose a picture" />
         <activity android:name=".MyProfileActivity" />
-        <activity android:name=".SearchUserActivity" />
+        <activity
+            android:name=".SearchUserActivity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".UserProfileActivity" />
-        <activity android:name=".InsertDescriptionActivity"></activity>
+        <activity
+            android:name=".InsertDescriptionActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

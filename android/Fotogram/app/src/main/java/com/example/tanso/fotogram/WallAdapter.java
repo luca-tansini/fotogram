@@ -87,12 +87,12 @@ class GetViewTask extends AsyncTask<Void,Void,Drawable[]>{
 
     @Override
     protected Drawable[] doInBackground(Void... voids) {
-        Drawable pics[] = new BitmapDrawable[]{null,null};
-        if(p.getUser().getProfilePicture().getBitmap() != null)
+        Drawable pics[] = new Drawable[]{null,null};
+        if(p.getUser().getProfilePicture() != null && p.getUser().getProfilePicture().getBitmap() != null)
             pics[0] = CircularBitmapDrawableFactory.create(context, p.getUser().getProfilePicture().getBitmap());
         else
             pics[0] = CircularBitmapDrawableFactory.create(context, BitmapFactory.decodeResource(context.getResources(),R.drawable.user));
-        if(p.getImage().getBitmap() != null)
+        if(p.getImage() != null && p.getImage().getBitmap() != null)
             pics[1] = new BitmapDrawable(context.getResources(), p.getImage().getBitmap());
         else
             pics[1] = new BitmapDrawable(context.getResources(), BitmapFactory.decodeResource(context.getResources(),R.drawable.dummy_post_xs));
