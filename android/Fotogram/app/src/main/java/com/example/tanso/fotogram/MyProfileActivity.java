@@ -78,7 +78,7 @@ public class MyProfileActivity extends AppCompatActivity {
         final ListView userWallLV = findViewById(R.id.userWall);
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/profile";
-        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest profileRequest = new StringRequest(Request.Method.POST, url,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -88,10 +88,10 @@ public class MyProfileActivity extends AppCompatActivity {
 
                         //Check if the user profile picture has changed
                         String pic = obj.getString("img");
-                        if(!pic.substring(0,16<=pic.length()? 16:pic.length()).equals(user.getProfilePicture().hash()))
-                            user.updateProfilePicture(new Image(pic));
-                        if(user.getProfilePicture() != null && user.getProfilePicture().getBitmap() != null)
-                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),user.getProfilePicture().getBitmap()));
+                        if(!pic.equals("null"))
+                            user.updateProfilePicture(Base64Images.base64toBitmap(pic));
+                        if(user.getProfilePicture() != null)
+                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),user.getProfilePicture()));
                         else
                             imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_full));
 
@@ -99,7 +99,7 @@ public class MyProfileActivity extends AppCompatActivity {
                         for(int i=0; i<jsonArray.length(); i++) {
                             JSONObject j = (JSONObject) jsonArray.get(i);
                             if(!j.getString("img").equals("null"))
-                                userWall.add(new Post(user, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                userWall.add(new Post(user, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                             else
                                 userWall.add(new Post(user, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                         }
@@ -126,7 +126,7 @@ public class MyProfileActivity extends AppCompatActivity {
                 return params;
             }
         };
-        rq.add(followedRequest);
+        rq.add(profileRequest);
     }
 
     @Override

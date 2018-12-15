@@ -10,9 +10,9 @@ public class Post {
     private User user;
     private Timestamp timestamp;
     private String description;
-    private Image image;
+    private Bitmap image;
 
-    public Post(User user, Image image, String description, Timestamp timestamp) {
+    public Post(User user, Bitmap image, String description, Timestamp timestamp) {
         this.user = user;
         this.image = image;
         this.description = description;
@@ -23,7 +23,7 @@ public class Post {
         return user;
     }
 
-    public Image getImage() {
+    public Bitmap getImage() {
         return image;
     }
 

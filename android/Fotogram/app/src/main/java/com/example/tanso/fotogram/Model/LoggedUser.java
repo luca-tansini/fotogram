@@ -10,7 +10,7 @@ public class LoggedUser extends User {
     //TODO: sostituire con hashmap nome,user
     private List<User> following;
 
-    public LoggedUser(String username, Image profilePicture, String sessionId, List<User> following) {
+    public LoggedUser(String username, Bitmap profilePicture, String sessionId, List<User> following) {
         super(username, profilePicture);
         this.sessionId = sessionId;
         this.following = following;

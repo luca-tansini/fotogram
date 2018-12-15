@@ -70,12 +70,12 @@ public class HomeActivity extends AppCompatActivity {
                                 //Logged user data
                                 if(j.get("name").equals(username)) {
                                     if (!j.getString("picture").equals("null"))
-                                        Model.getInstance().getLoggedUser().updateProfilePicture(new Image(j.getString("picture")));
+                                        Model.getInstance().getLoggedUser().updateProfilePicture(Base64Images.base64toBitmap(j.getString("picture")));
                                     Model.getInstance().getLoggedUser().setFollowing(following);
                                 }//Other users data
                                 else {
                                     if (!j.getString("picture").equals("null"))
-                                        following.add(new User(j.getString("name"), new Image(j.getString("picture"))));
+                                        following.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
                                     else
                                         following.add(new User(j.getString("name"), null));
                                 }
@@ -105,29 +105,28 @@ public class HomeActivity extends AppCompatActivity {
     private void wallCall(){
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/wall";
-        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest wallRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("posts");
-                            List<Post> wall = new ArrayList<Post>();
+                            List<Post> wall = new ArrayList<>();
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 String usr = j.getString("user");
                                 for(User u: Model.getInstance().getLoggedUser().getFollowing()){
-                                    if(u.getUsername().equals(usr))
-                                        if(!j.getString("img").equals("null"))
-                                            wall.add(new Post(u, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                    if(u.getUsername().equals(usr)) {
+                                        if (!j.getString("img").equals("null"))
+                                            wall.add(new Post(u, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                                         else
                                             wall.add(new Post(u, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
-                                    else
-                                        Log.d("ajeje", "post owner not in following?");
+                                        break;
+                                    }
                                 }
                             }
                             Model.getInstance().setHomeWall(wall);
-                            //Show wall
                             showWall();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -148,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
                 return params;
             }
         };
-        rq.add(followedRequest);
+        rq.add(wallRequest);
     }
 
     private void showWall(){

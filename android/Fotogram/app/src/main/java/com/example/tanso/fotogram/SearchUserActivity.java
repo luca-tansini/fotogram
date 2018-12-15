@@ -20,6 +20,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Model.Base64Images;
 import com.example.tanso.fotogram.Model.Image;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.User;
@@ -103,7 +104,7 @@ public class SearchUserActivity extends AppCompatActivity {
         //users REST call
         RequestQueue rq = Model.getRequestQueue(getApplicationContext());
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/users";
-        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest usersRequest = new StringRequest(Request.Method.POST, url,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -114,7 +115,7 @@ public class SearchUserActivity extends AppCompatActivity {
                         for(int i=0; i<jsonArray.length(); i++) {
                             JSONObject j = (JSONObject) jsonArray.get(i);
                             if(!j.getString("picture").equals("null"))
-                                users.add(new User(j.getString("name"), new Image(j.getString("picture"))));
+                                users.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
                             users.add(new User(j.getString("name"), null));
                         }
                         SuggestionAdapter suggestionAdapter = new SuggestionAdapter(getApplicationContext(), R.layout.suggestion_entry, users);
@@ -140,7 +141,7 @@ public class SearchUserActivity extends AppCompatActivity {
                 return params;
             }
         };
-        rq.add(followedRequest);
+        rq.add(usersRequest);
     }
 
     @Override

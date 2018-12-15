@@ -1,8 +1,10 @@
 package com.example.tanso.fotogram;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -13,7 +15,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.example.tanso.fotogram.Model.Image;
+import com.example.tanso.fotogram.Model.Base64Images;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
 import com.example.tanso.fotogram.Model.User;
@@ -21,14 +23,17 @@ import com.example.tanso.fotogram.Model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserProfileActivity extends AppCompatActivity {
+
+    private String username;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,43 +41,42 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
 
         //recupera nome utente dall'Intent
-        String username = getIntent().getExtras().getString("username");
+        username = getIntent().getExtras().getString("username");
+        user = new User(username, null);
         TextView usernameTV = findViewById(R.id.textViewUsername);
         usernameTV.setText(username);
 
-        profileCall(username);
+        profileCall();
 
     }
 
-    private void profileCall(final String username){
+    private void profileCall(){
         //profile(user) REST call
         final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
         final ListView userWallLV = findViewById(R.id.userWall);
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/profile";
-        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest profileRequest = new StringRequest(Request.Method.POST, url,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.d("ajeje", response);
                     try {
                         JSONObject obj = new JSONObject(response);
-                        User user = new User(username, null);
 
                         //Set profile picture
                         String pic = obj.getString("img");
                         if(!pic.equals("null")) {
-                            Image img = new Image(pic);
+                            Bitmap img = Base64Images.base64toBitmap(pic);
                             if(img != null) {
                                 user.updateProfilePicture(img);
-                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(), user.getProfilePicture().getBitmap()));
+                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(), user.getProfilePicture()));
                             }
                         }
                         else
-                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_full));
+                            imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user));
 
                         //Set (Un)Follow Button
-                        Button buttonFollow = findViewById(R.id.buttonFollow);
+                        final Button buttonFollow = findViewById(R.id.buttonFollow);
                         if(Model.getInstance().getLoggedUser().getFollowing().contains(user)){
                             buttonFollow.setText("UNFOLLOW");
                             buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorUnfollow));
@@ -81,6 +85,15 @@ public class UserProfileActivity extends AppCompatActivity {
                             buttonFollow.setText("FOLLOW");
                             buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorFollow));
                         }
+                        buttonFollow.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(buttonFollow.getText().equals("FOLLOW"))
+                                    follow();
+                                else
+                                    unfollow();
+                            }
+                        });
 
                         //Set userWall
                         JSONArray jsonArray = obj.getJSONArray("posts");
@@ -88,7 +101,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         for(int i=0; i<jsonArray.length(); i++) {
                             JSONObject j = (JSONObject) jsonArray.get(i);
                             if(!j.getString("img").equals("null"))
-                                userWall.add(new Post(user, new Image(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                userWall.add(new Post(user, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                             else
                                 userWall.add(new Post(user, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                         }
@@ -115,7 +128,69 @@ public class UserProfileActivity extends AppCompatActivity {
                 return params;
             }
         };
-        rq.add(followedRequest);
+        rq.add(profileRequest);
+    }
+
+    private void follow() {
+        RequestQueue rq = Model.getRequestQueue(this);
+        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/follow";
+        StringRequest followRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Model.getInstance().getLoggedUser().getFollowing().add(user);
+                        Button buttonFollow = findViewById(R.id.buttonFollow);
+                        buttonFollow.setText("UNFOLLOW");
+                        buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorUnfollow));
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ajeje", "follow error: "+error.toString());
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
+                params.put("username", username);
+                return params;
+            }
+        };
+        rq.add(followRequest);
+    }
+
+    private void unfollow() {
+        RequestQueue rq = Model.getRequestQueue(this);
+        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/unfollow";
+        StringRequest unfollowRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Model.getInstance().getLoggedUser().getFollowing().remove(user);
+                        Button buttonFollow = findViewById(R.id.buttonFollow);
+                        buttonFollow.setText("FOLLOW");
+                        buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorFollow));
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ajeje", "unfollow error: "+error.toString());
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
+                params.put("username", username);
+                return params;
+            }
+        };
+        rq.add(unfollowRequest);
     }
 
 }
