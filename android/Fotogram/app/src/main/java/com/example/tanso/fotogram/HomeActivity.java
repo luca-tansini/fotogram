@@ -3,6 +3,7 @@ package com.example.tanso.fotogram;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -32,20 +33,51 @@ import java.util.Map;
 public class HomeActivity extends AppCompatActivity {
 
     private MyNavigationItemSelectedListener myNavigationItemSelectedListener;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Model model = Model.getInstance();
-        //Followed REST call
-        followedCall(model.getLoggedUser().getSessionId(), model.getLoggedUser().getUsername());
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
         nav.setSelectedItemId(R.id.navigation_home);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
+
+        //SetRefreshLayout
+        refreshLayout = findViewById(R.id.swipeRefreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                wallCall();
+            }
+        });
+
+        //Set wall listener
+        ListView wall = findViewById(R.id.wall);
+        wall.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Post p = (Post) parent.getAdapter().getItem(position);
+                User u = p.getUser();
+                if(u.getUsername().equals(Model.getInstance().getLoggedUser().getUsername())){
+                    Intent myprofile = new Intent(getApplicationContext(), MyProfileActivity.class);
+                    myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    getApplicationContext().startActivity(myprofile);
+                }
+                else{
+                    Intent userprofile = new Intent(getApplicationContext(), UserProfileActivity.class);
+                    userprofile.putExtra("username", u.getUsername());
+                    getApplicationContext().startActivity(userprofile);
+                }
+            }
+        });
+
+        Model model = Model.getInstance();
+        //Followed REST call
+        followedCall(model.getLoggedUser().getSessionId(), model.getLoggedUser().getUsername());
 
         //Wall REST call
         wallCall();
@@ -102,6 +134,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void wallCall(){
+        refreshLayout.setRefreshing(true);
         RequestQueue rq = Model.getRequestQueue(this);
         String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/wall";
         StringRequest wallRequest = new StringRequest(Request.Method.POST, url,
@@ -149,28 +182,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showWall(){
-        //Set listview
+        //Set listview adapter
         Model model = Model.getInstance();
         ListView lv = findViewById(R.id.wall);
         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, model.getHomeWall());
         lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Post p = (Post) parent.getAdapter().getItem(position);
-                User u = p.getUser();
-                if(u.getUsername().equals(Model.getInstance().getLoggedUser().getUsername())){
-                    Intent myprofile = new Intent(getApplicationContext(), MyProfileActivity.class);
-                    myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    getApplicationContext().startActivity(myprofile);
-                }
-                else{
-                    Intent userprofile = new Intent(getApplicationContext(), UserProfileActivity.class);
-                    userprofile.putExtra("username", u.getUsername());
-                    getApplicationContext().startActivity(userprofile);
-                }
-            }
-        });
+        refreshLayout.setRefreshing(false);
     }
 
     @Override

@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bottom_border_rectangle"
-            app:layout_constraintBottom_toTopOf="@+id/userWall"
+            app:layout_constraintBottom_toTopOf="@+id/swipeRefreshLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -73,17 +73,25 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <ListView
-            android:id="@+id/userWall"
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:fastScrollEnabled="true"
-            android:persistentDrawingCache="scrolling"
-            android:scrollingCache="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"></ListView>
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+            <ListView
+                android:id="@+id/userWall"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fastScrollEnabled="true"
+                android:persistentDrawingCache="scrolling"
+                android:scrollingCache="false"></ListView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </android.support.constraint.ConstraintLayout>
 

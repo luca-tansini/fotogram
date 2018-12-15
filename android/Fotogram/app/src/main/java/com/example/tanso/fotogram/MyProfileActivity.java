@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +41,8 @@ import java.util.Map;
 public class MyProfileActivity extends AppCompatActivity {
 
     private MyNavigationItemSelectedListener myNavigationItemSelectedListener;
+    private SwipeRefreshLayout refreshLayout;
+    private LoggedUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +55,18 @@ public class MyProfileActivity extends AppCompatActivity {
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
 
+        //SetRefreshLayout
+        refreshLayout = findViewById(R.id.swipeRefreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                profileCall();
+            }
+        });
+
         //Username
         Model model = Model.getInstance();
-        final LoggedUser user = model.getLoggedUser();
+        user = model.getLoggedUser();
         TextView usernameTV = findViewById(R.id.textViewUsername);
         usernameTV.setText(user.getUsername());
 
@@ -68,11 +80,11 @@ public class MyProfileActivity extends AppCompatActivity {
         });
 
         //Setup User Wall
-        profileCall(user);
+        profileCall();
 
     }
 
-    private void profileCall(final User user){
+    private void profileCall(){
         //profile(user) REST call
         final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
         final ListView userWallLV = findViewById(R.id.userWall);
@@ -106,6 +118,7 @@ public class MyProfileActivity extends AppCompatActivity {
                         Model.getInstance().setLoggedUserWall(userWall);
                         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
                         userWallLV.setAdapter(adapter);
+                        refreshLayout.setRefreshing(false);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -1,6 +1,7 @@
 package com.example.tanso.fotogram;
 
 import android.graphics.Bitmap;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,11 +35,21 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private String username;
     private User user;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
+        //SetRefreshLayout
+        refreshLayout = findViewById(R.id.swipeRefreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                profileCall();
+            }
+        });
 
         //recupera nome utente dall'Intent
         username = getIntent().getExtras().getString("username");
@@ -108,6 +119,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         Model.getInstance().setLoggedUserWall(userWall);
                         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
                         userWallLV.setAdapter(adapter);
+                        refreshLayout.setRefreshing(false);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
