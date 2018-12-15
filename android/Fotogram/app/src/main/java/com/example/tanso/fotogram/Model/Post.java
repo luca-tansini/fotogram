@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 
 import java.sql.Timestamp;
 
-//TODO:refactoring per usare GSON?
 public class Post {
 
     private User user;

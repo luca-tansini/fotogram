@@ -2,15 +2,15 @@ package com.example.tanso.fotogram.Model;
 
 import android.graphics.Bitmap;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class LoggedUser extends User {
 
     private String sessionId;
-    //TODO: sostituire con hashmap nome,user
-    private List<User> following;
+    private HashMap<String,User> following;
 
-    public LoggedUser(String username, Bitmap profilePicture, String sessionId, List<User> following) {
+    public LoggedUser(String username, Bitmap profilePicture, String sessionId, HashMap<String,User> following) {
         super(username, profilePicture);
         this.sessionId = sessionId;
         this.following = following;
@@ -20,11 +20,11 @@ public class LoggedUser extends User {
         return sessionId;
     }
 
-    public void setFollowing(List<User> following) {
+    public void setFollowing(HashMap<String,User> following) {
         this.following = following;
     }
 
-    public List<User> getFollowing() {
+    public HashMap<String,User> getFollowing() {
         return following;
     }
 

@@ -15,8 +15,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.tanso.fotogram.Model.Base64Images;
-import com.example.tanso.fotogram.Model.Image;
-import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
 import com.example.tanso.fotogram.Model.User;
@@ -64,7 +62,7 @@ public class HomeActivity extends AppCompatActivity {
                         try {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("followed");
-                            List<User> following = new ArrayList<User>();
+                            HashMap<String,User> following = new HashMap<>();
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 //Logged user data
@@ -74,10 +72,11 @@ public class HomeActivity extends AppCompatActivity {
                                     Model.getInstance().getLoggedUser().setFollowing(following);
                                 }//Other users data
                                 else {
+                                    String name = j.getString("name");
                                     if (!j.getString("picture").equals("null"))
-                                        following.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
+                                        following.put(name, new User(name, Base64Images.base64toBitmap(j.getString("picture"))));
                                     else
-                                        following.add(new User(j.getString("name"), null));
+                                        following.put(name, new User(name, null));
                                 }
                             }
                         } catch (JSONException e) {
@@ -116,15 +115,14 @@ public class HomeActivity extends AppCompatActivity {
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 String usr = j.getString("user");
-                                for(User u: Model.getInstance().getLoggedUser().getFollowing()){
-                                    if(u.getUsername().equals(usr)) {
-                                        if (!j.getString("img").equals("null"))
-                                            wall.add(new Post(u, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
-                                        else
-                                            wall.add(new Post(u, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
-                                        break;
-                                    }
-                                }
+                                User u = Model.getInstance().getLoggedUser().getFollowing().get(usr);
+                                if(u != null)
+                                    if (!j.getString("img").equals("null"))
+                                        wall.add(new Post(u, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                    else
+                                        wall.add(new Post(u, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                                else
+                                    Log.d("ajeje", "error: user("+usr+") not in following?");
                             }
                             Model.getInstance().setHomeWall(wall);
                             showWall();

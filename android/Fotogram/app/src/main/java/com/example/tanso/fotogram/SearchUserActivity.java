@@ -91,11 +91,17 @@ public class SearchUserActivity extends AppCompatActivity {
         suggestionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO: controlla che non sia logged user
                 User u = (User) parent.getAdapter().getItem(position);
-                Intent userProfile = new Intent(getApplicationContext(), UserProfileActivity.class);
-                userProfile.putExtra("username", u.getUsername());
-                startActivity(userProfile);
+                if(u.getUsername().equals(Model.getInstance().getLoggedUser().getUsername())){
+                    Intent myprofile = new Intent(getApplicationContext(), MyProfileActivity.class);
+                    myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    getApplicationContext().startActivity(myprofile);
+                }
+                else{
+                    Intent userprofile = new Intent(getApplicationContext(), UserProfileActivity.class);
+                    userprofile.putExtra("username", u.getUsername());
+                    getApplicationContext().startActivity(userprofile);
+                }
             }
         });
     }

@@ -77,7 +77,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
                         //Set (Un)Follow Button
                         final Button buttonFollow = findViewById(R.id.buttonFollow);
-                        if(Model.getInstance().getLoggedUser().getFollowing().contains(user)){
+                        if(Model.getInstance().getLoggedUser().getFollowing().containsKey(username)){
                             buttonFollow.setText("UNFOLLOW");
                             buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorUnfollow));
                         }
@@ -138,7 +138,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Model.getInstance().getLoggedUser().getFollowing().add(user);
+                        Model.getInstance().getLoggedUser().getFollowing().put(username,user);
                         Button buttonFollow = findViewById(R.id.buttonFollow);
                         buttonFollow.setText("UNFOLLOW");
                         buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorUnfollow));
@@ -169,7 +169,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Model.getInstance().getLoggedUser().getFollowing().remove(user);
+                        Model.getInstance().getLoggedUser().getFollowing().remove(username);
                         Button buttonFollow = findViewById(R.id.buttonFollow);
                         buttonFollow.setText("FOLLOW");
                         buttonFollow.setBackgroundTintList(getResources().getColorStateList(R.color.colorFollow));
