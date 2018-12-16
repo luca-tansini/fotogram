@@ -116,7 +116,6 @@ public class UserProfileActivity extends AppCompatActivity {
                             else
                                 userWall.add(new Post(user, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                         }
-                        Model.getInstance().setLoggedUserWall(userWall);
                         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
                         userWallLV.setAdapter(adapter);
                         refreshLayout.setRefreshing(false);

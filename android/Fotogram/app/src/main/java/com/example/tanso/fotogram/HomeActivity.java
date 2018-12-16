@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.tanso.fotogram.Model.Base64Images;
+import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.Post;
 import com.example.tanso.fotogram.Model.User;
@@ -145,10 +146,11 @@ public class HomeActivity extends AppCompatActivity {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("posts");
                             List<Post> wall = new ArrayList<>();
+                            Model model = Model.getInstance();
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 String usr = j.getString("user");
-                                User u = Model.getInstance().getLoggedUser().getFollowing().get(usr);
+                                User u = usr.equals(model.getLoggedUser().getUsername())? model.getLoggedUser() : model.getLoggedUser().getFollowing().get(usr);
                                 if(u != null)
                                     if (!j.getString("img").equals("null"))
                                         wall.add(new Post(u, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
@@ -157,7 +159,7 @@ public class HomeActivity extends AppCompatActivity {
                                 else
                                     Log.d("ajeje", "error: user("+usr+") not in following?");
                             }
-                            Model.getInstance().setHomeWall(wall);
+                            model.setHomeWall(wall);
                             showWall();
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -14,7 +14,6 @@ public class Model {
 
     private LoggedUser loggedUser;
     private List<Post> homeWall;
-    private List<Post> loggedUserWall;
 
     private Model(){}
 
@@ -48,13 +47,5 @@ public class Model {
 
     public void setHomeWall(List<Post> homeWall) {
         this.homeWall = homeWall;
-    }
-
-    public List<Post> getLoggedUserWall() {
-        return loggedUserWall;
-    }
-
-    public void setLoggedUserWall(List<Post> loggedUserWall) {
-        this.loggedUserWall = loggedUserWall;
     }
 }
