@@ -71,6 +71,21 @@
                 app:layout_constraintStart_toEndOf="@+id/imageViewProfilePicture"
                 app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
 
+            <Button
+                android:id="@+id/buttonUpdatePicture"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/round_shape"
+                android:elevation="1dp"
+                android:drawableTop="@drawable/ic_plus_round"
+                android:paddingTop="3dp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageViewProfilePicture"
+                app:layout_constraintEnd_toStartOf="@+id/imageViewProfilePicture"
+                app:layout_constraintHorizontal_bias="0.25"
+                app:layout_constraintStart_toEndOf="@+id/imageViewProfilePicture"
+                app:layout_constraintTop_toTopOf="@+id/imageViewProfilePicture"
+                app:layout_constraintVertical_bias="1.0" />
+
         </android.support.constraint.ConstraintLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout

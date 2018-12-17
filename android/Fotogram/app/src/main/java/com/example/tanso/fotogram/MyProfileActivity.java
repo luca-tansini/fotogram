@@ -79,6 +79,15 @@ public class MyProfileActivity extends AppCompatActivity {
             }
         });
 
+        //Update profile picture button
+        Button pictureUpdateButton = findViewById(R.id.buttonUpdatePicture);
+        pictureUpdateButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), UpdateProfilePictureActivity.class));
+            }
+        });
+
         //Setup User Wall
         profileCall();
 

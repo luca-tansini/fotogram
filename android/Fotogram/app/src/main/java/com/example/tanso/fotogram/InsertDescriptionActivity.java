@@ -20,11 +20,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.example.tanso.fotogram.Model.Base64Images;
 import com.example.tanso.fotogram.Model.Model;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +42,7 @@ public class InsertDescriptionActivity extends AppCompatActivity {
 
         //Set the image
         Uri imageUri = Uri.parse(getIntent().getExtras().getString("img"));
-        ImageView iv = findViewById(R.id.imageViewUpload);
+        ImageView iv = findViewById(R.id.imageViewUpdateProfilePicture);
         try{
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             iv.setImageBitmap(bitmap);
@@ -56,7 +52,7 @@ public class InsertDescriptionActivity extends AppCompatActivity {
         base64 = getIntent().getExtras().getString("base64");
 
         //Make post button
-        final Button uploadButton = findViewById(R.id.buttonCreatePost);
+        final Button uploadButton = findViewById(R.id.buttonChooseFromGallery);
         uploadButton.setEnabled(false);
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -16,7 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <Button
-        android:id="@+id/buttonCreatePost"
+        android:id="@+id/buttonChooseFromGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/round_shape"
@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextDescription" />
 
     <ImageView
-        android:id="@+id/imageViewUpload"
+        android:id="@+id/imageViewUpdateProfilePicture"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="8dp"
@@ -48,9 +48,9 @@
         android:ems="10"
         android:hint="Set post description"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/buttonCreatePost"
+        app:layout_constraintBottom_toTopOf="@+id/buttonChooseFromGallery"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewUpload" />
+        app:layout_constraintTop_toBottomOf="@+id/imageViewUpdateProfilePicture" />
 
 </android.support.constraint.ConstraintLayout>
