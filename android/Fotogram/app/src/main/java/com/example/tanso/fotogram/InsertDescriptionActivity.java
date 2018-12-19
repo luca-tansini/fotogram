@@ -9,21 +9,16 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Controller.FotogramAPI;
+import com.example.tanso.fotogram.Controller.ResponseCode;
 import com.example.tanso.fotogram.Model.Model;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class InsertDescriptionActivity extends AppCompatActivity {
 
@@ -80,37 +75,23 @@ public class InsertDescriptionActivity extends AppCompatActivity {
     }
 
     private void makePost(){
-        //TODO: fare vera chiamata REST
         EditText tv = findViewById(R.id.editTextDescription);
         final String description = tv.getText().toString();
 
-        RequestQueue rq = Model.getRequestQueue(this);
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/create_post";
-        StringRequest createPostRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
+        params.put("img", base64);
+        params.put("message", description);
+        FotogramAPI.makeAPICall(FotogramAPI.API.CREATE_POST, getApplicationContext(), params,
+                new ResponseCode() {
                     @Override
-                    public void onResponse(String response) {
+                    public void run(String response) {
                         Intent home = new Intent(getApplicationContext(), HomeActivity.class);
                         startActivity(home);
                         finish();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "create post error: "+error.toString());
-                    }
-                }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
-                params.put("img", base64);
-                params.put("message", description);
-                return params;
-            }
-        };
-        rq.add(createPostRequest);
+                null
+        );
     }
 }

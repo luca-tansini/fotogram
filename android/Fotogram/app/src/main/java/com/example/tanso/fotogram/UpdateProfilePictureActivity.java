@@ -19,6 +19,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Controller.FotogramAPI;
+import com.example.tanso.fotogram.Controller.ResponseCode;
 import com.example.tanso.fotogram.Model.Base64Images;
 import com.example.tanso.fotogram.Model.Model;
 
@@ -65,32 +67,19 @@ public class UpdateProfilePictureActivity extends AppCompatActivity {
     }
 
     private void pictureUpdateCall() {
-        RequestQueue rq = Model.getRequestQueue(this);
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/picture_update";
-        StringRequest pictureUpdateRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
+        params.put("picture", base64);
+        FotogramAPI.makeAPICall(FotogramAPI.API.PICTURE_UPDATE, getApplicationContext(), params,
+                new ResponseCode() {
                     @Override
-                    public void onResponse(String response) {
+                    public void run(String response) {
                         startActivity(new Intent(getApplicationContext(), MyProfileActivity.class));
                         finish();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "picture update error: "+error.toString());
-                    }
-                }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
-                params.put("picture", base64);
-                return params;
-            }
-        };
-        rq.add(pictureUpdateRequest);
+                null
+        );
     }
 
     @Override

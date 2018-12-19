@@ -13,7 +13,6 @@ public class Model {
     private static RequestQueue requestQueue;
 
     private LoggedUser loggedUser;
-    private List<Post> homeWall;
 
     private Model(){}
 
@@ -39,13 +38,5 @@ public class Model {
 
     public void setLoggedUser(LoggedUser loggedUser) {
         this.loggedUser = loggedUser;
-    }
-
-    public List<Post> getHomeWall() {
-        return homeWall;
-    }
-
-    public void setHomeWall(List<Post> homeWall) {
-        this.homeWall = homeWall;
     }
 }

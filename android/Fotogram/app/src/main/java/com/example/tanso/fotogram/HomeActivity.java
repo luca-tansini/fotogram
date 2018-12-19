@@ -6,6 +6,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -15,6 +16,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Controller.FotogramAPI;
+import com.example.tanso.fotogram.Controller.ResponseCode;
 import com.example.tanso.fotogram.Model.Base64Images;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
@@ -35,11 +38,24 @@ public class HomeActivity extends AppCompatActivity {
 
     private MyNavigationItemSelectedListener myNavigationItemSelectedListener;
     private SwipeRefreshLayout refreshLayout;
+    private LoggedUser loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        //Cache logged user data
+        loggedUser = Model.getInstance().getLoggedUser();
+
+        //SetRefreshLayout
+        refreshLayout = findViewById(R.id.swipeRefreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                followedCall();
+            }
+        });
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
@@ -47,14 +63,6 @@ public class HomeActivity extends AppCompatActivity {
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
 
-        //SetRefreshLayout
-        refreshLayout = findViewById(R.id.swipeRefreshLayout);
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                wallCall();
-            }
-        });
 
         //Set wall listener
         ListView wall = findViewById(R.id.wall);
@@ -63,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Post p = (Post) parent.getAdapter().getItem(position);
                 User u = p.getUser();
-                if(u.getUsername().equals(Model.getInstance().getLoggedUser().getUsername())){
+                if(u.getUsername().equals(loggedUser.getUsername())){
                     Intent myprofile = new Intent(getApplicationContext(), MyProfileActivity.class);
                     myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     getApplicationContext().startActivity(myprofile);
@@ -76,22 +84,23 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        Model model = Model.getInstance();
-        //Followed REST call
-        followedCall(model.getLoggedUser().getSessionId(), model.getLoggedUser().getUsername());
+        //Show Wall
+        followedCall();
 
-        //Wall REST call
-        wallCall();
     }
 
-    private void followedCall(final String sessionId, final String username){
-
-        RequestQueue rq = Model.getRequestQueue(this);
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/followed";
-        StringRequest followedRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+    /*
+    followedCall retrieves followed users profile pictures from server
+    then calls wallCall to download posts and show them
+    */
+    private void followedCall(){
+        refreshLayout.setRefreshing(true);
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id",loggedUser.getSessionId());
+        FotogramAPI.makeAPICall(FotogramAPI.API.FOLLOWED, getApplicationContext(), params,
+                new ResponseCode() {
                     @Override
-                    public void onResponse(String response) {
+                    public void run(String response) {
                         try {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("followed");
@@ -99,10 +108,10 @@ public class HomeActivity extends AppCompatActivity {
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 //Logged user data
-                                if(j.get("name").equals(username)) {
+                                if(j.get("name").equals(loggedUser.getUsername())) {
                                     if (!j.getString("picture").equals("null"))
-                                        Model.getInstance().getLoggedUser().updateProfilePicture(Base64Images.base64toBitmap(j.getString("picture")));
-                                    Model.getInstance().getLoggedUser().setFollowing(following);
+                                        loggedUser.updateProfilePicture(Base64Images.base64toBitmap(j.getString("picture")));
+                                    loggedUser.setFollowing(following);
                                 }//Other users data
                                 else {
                                     String name = j.getString("name");
@@ -112,45 +121,34 @@ public class HomeActivity extends AppCompatActivity {
                                         following.put(name, new User(name, null));
                                 }
                             }
+                            wallCall();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "followed error: "+error.networkResponse.toString());
-                    }
-                }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("session_id",sessionId);
-                return params;
-            }
-        };
-        rq.add(followedRequest);
+                null);
     }
 
+    /*
+    wallCall retrieves posts from server
+    then calls showWall to show them
+     */
     private void wallCall(){
-        refreshLayout.setRefreshing(true);
-        RequestQueue rq = Model.getRequestQueue(this);
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/wall";
-        StringRequest wallRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id",loggedUser.getSessionId());
+        FotogramAPI.makeAPICall(FotogramAPI.API.WALL, getApplicationContext(), params,
+                new ResponseCode() {
                     @Override
-                    public void onResponse(String response) {
+                    public void run(String response) {
                         try {
                             JSONObject obj = new JSONObject(response);
                             JSONArray jsonArray = obj.getJSONArray("posts");
                             List<Post> wall = new ArrayList<>();
-                            Model model = Model.getInstance();
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 String usr = j.getString("user");
-                                User u = usr.equals(model.getLoggedUser().getUsername())? model.getLoggedUser() : model.getLoggedUser().getFollowing().get(usr);
+                                User u = usr.equals(loggedUser.getUsername())? loggedUser : loggedUser.getFollowing().get(usr);
                                 if(u != null)
                                     if (!j.getString("img").equals("null"))
                                         wall.add(new Post(u, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
@@ -159,35 +157,20 @@ public class HomeActivity extends AppCompatActivity {
                                 else
                                     Log.d("ajeje", "error: user("+usr+") not in following?");
                             }
-                            model.setHomeWall(wall);
-                            showWall();
+                            showWall(wall);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "wall error: "+error.toString());
-                    }
-                }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("session_id",Model.getInstance().getLoggedUser().getSessionId());
-                return params;
-            }
-        };
-        rq.add(wallRequest);
+                null
+        );
     }
 
-    private void showWall(){
+    private void showWall(List<Post> wall){
         //Set listview adapter
-        Model model = Model.getInstance();
         ListView lv = findViewById(R.id.wall);
-        WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, model.getHomeWall());
+        WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, wall);
         lv.setAdapter(adapter);
         refreshLayout.setRefreshing(false);
     }

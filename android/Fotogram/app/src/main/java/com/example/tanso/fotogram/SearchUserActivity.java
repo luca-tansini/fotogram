@@ -20,8 +20,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.tanso.fotogram.Controller.FotogramAPI;
+import com.example.tanso.fotogram.Controller.ResponseCode;
 import com.example.tanso.fotogram.Model.Base64Images;
-import com.example.tanso.fotogram.Model.Image;
 import com.example.tanso.fotogram.Model.Model;
 import com.example.tanso.fotogram.Model.User;
 
@@ -107,47 +108,34 @@ public class SearchUserActivity extends AppCompatActivity {
     }
 
     private void usersCall(final String usernamestart){
-        //users REST call
-        RequestQueue rq = Model.getRequestQueue(getApplicationContext());
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/users";
-        StringRequest usersRequest = new StringRequest(Request.Method.POST, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    try {
-                        JSONObject obj = new JSONObject(response);
-                        JSONArray jsonArray = obj.getJSONArray("users");
-                        ArrayList<User> users = new ArrayList<>();
-                        for(int i=0; i<jsonArray.length(); i++) {
-                            JSONObject j = (JSONObject) jsonArray.get(i);
-                            if(!j.getString("picture").equals("null"))
-                                users.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
-                            users.add(new User(j.getString("name"), null));
+
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id", Model.getInstance().getLoggedUser().getSessionId());
+        params.put("usernamestart", usernamestart);
+        FotogramAPI.makeAPICall(FotogramAPI.API.USERS, getApplicationContext(), params,
+                new ResponseCode() {
+                    @Override
+                    public void run(String response) {
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            JSONArray jsonArray = obj.getJSONArray("users");
+                            ArrayList<User> users = new ArrayList<>();
+                            for(int i=0; i<jsonArray.length(); i++) {
+                                JSONObject j = (JSONObject) jsonArray.get(i);
+                                if(!j.getString("picture").equals("null"))
+                                    users.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
+                                users.add(new User(j.getString("name"), null));
+                            }
+                            SuggestionAdapter suggestionAdapter = new SuggestionAdapter(getApplicationContext(), R.layout.suggestion_entry, users);
+                            ListView suggestionList = findViewById(R.id.suggestionList);
+                            suggestionList.setAdapter(suggestionAdapter);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        SuggestionAdapter suggestionAdapter = new SuggestionAdapter(getApplicationContext(), R.layout.suggestion_entry, users);
-                        ListView suggestionList = findViewById(R.id.suggestionList);
-                        suggestionList.setAdapter(suggestionAdapter);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("ajeje", "users error: "+error.networkResponse.toString());
-                }
-            }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("session_id", Model.getInstance().getLoggedUser().getSessionId());
-                params.put("usernamestart", usernamestart);
-                return params;
-            }
-        };
-        rq.add(usersRequest);
+                },
+                null
+        );
     }
 
     @Override

@@ -12,25 +12,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.example.tanso.fotogram.Model.Base64Images;
-import com.example.tanso.fotogram.Model.Image;
+import com.example.tanso.fotogram.Controller.ErrorCode;
+import com.example.tanso.fotogram.Controller.FotogramAPI;
+import com.example.tanso.fotogram.Controller.ResponseCode;
 import com.example.tanso.fotogram.Model.LoggedUser;
 import com.example.tanso.fotogram.Model.Model;
-import com.example.tanso.fotogram.Model.User;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -107,39 +96,28 @@ public class LoginActivity extends AppCompatActivity {
         usr = usernameET.getText().toString();
         pswd = passwordET.getText().toString();
 
-        //Volley POST request
-        RequestQueue rq = Model.getRequestQueue(this);
-        String url = "https://ewserver.di.unimi.it/mobicomp/fotogram/login";
-        StringRequest sr = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        HashMap<String,String> params = new HashMap<>();
+        params.put("username",usr);
+        params.put("password",pswd);
+        FotogramAPI.makeAPICall(FotogramAPI.API.LOGIN,getApplicationContext(), params,
+                new ResponseCode() {
                     @Override
-                    public void onResponse(String sid) {
+                    public void run(String sid) {
                         SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString("sessionId", sid);
                         editor.putString("username", usr);
                         editor.apply();
-                        startHome(sid,usr);
+                        startHome(sid, usr);
                     }
                 },
-                new Response.ErrorListener() {
+                new ErrorCode() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("ajeje", "login error: "+error.toString());
+                    public void run(VolleyError error) {
                         TextView errorTV = findViewById(R.id.textViewError);
                         errorTV.setText("invalid username or password");
                     }
-                }
-        ){
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String,String> params = new HashMap<>();
-                params.put("username",usr);
-                params.put("password",pswd);
-                return params;
-            }
-        };
-        rq.add(sr);
+        });
     }
 
     private void startHome(String sid, String usr){
