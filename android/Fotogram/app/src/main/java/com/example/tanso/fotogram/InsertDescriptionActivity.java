@@ -87,6 +87,8 @@ public class InsertDescriptionActivity extends AppCompatActivity {
                     @Override
                     public void run(String response) {
                         Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+                        home.putExtra("mode", HomeActivity.REFRESH);
+                        home.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         startActivity(home);
                         finish();
                     }

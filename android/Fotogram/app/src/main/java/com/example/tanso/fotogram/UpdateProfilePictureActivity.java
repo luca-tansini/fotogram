@@ -74,7 +74,10 @@ public class UpdateProfilePictureActivity extends AppCompatActivity {
                 new ResponseCode() {
                     @Override
                     public void run(String response) {
-                        startActivity(new Intent(getApplicationContext(), MyProfileActivity.class));
+                        Intent myProfile = new Intent(getApplicationContext(), MyProfileActivity.class);
+                        myProfile.putExtra("mode", MyProfileActivity.REFRESH);
+                        myProfile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        startActivity(myProfile);
                         finish();
                     }
                 },

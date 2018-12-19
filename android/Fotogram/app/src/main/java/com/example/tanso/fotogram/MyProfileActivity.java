@@ -38,6 +38,8 @@ import java.util.Map;
 
 public class MyProfileActivity extends AppCompatActivity {
 
+    public static int REFRESH = 0;
+
     private MyNavigationItemSelectedListener myNavigationItemSelectedListener;
     private SwipeRefreshLayout refreshLayout;
     private LoggedUser loggedUser;
@@ -92,7 +94,6 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void profileCall(){
-        //profile(loggedUser) REST call
         final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
         final ListView userWallLV = findViewById(R.id.userWall);
 
@@ -135,13 +136,6 @@ public class MyProfileActivity extends AppCompatActivity {
         );
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        BottomNavigationView nav = findViewById(R.id.navigation);
-        nav.setSelectedItemId(R.id.navigation_my_profile);
-    }
-
     private void logout(){
 
         HashMap<String,String> params = new HashMap<>();
@@ -162,5 +156,22 @@ public class MyProfileActivity extends AppCompatActivity {
                 },
                 null
         );
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //Could update profile picture only
+        if(intent != null && intent.getExtras() != null && intent.getExtras().getInt("mode") == REFRESH){
+            Log.d("ajeje", "MyProfileActivity onRestart - REFRESH");
+            refreshLayout.setRefreshing(true);
+            profileCall();
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        BottomNavigationView nav = findViewById(R.id.navigation);
+        nav.setSelectedItemId(R.id.navigation_my_profile);
     }
 }

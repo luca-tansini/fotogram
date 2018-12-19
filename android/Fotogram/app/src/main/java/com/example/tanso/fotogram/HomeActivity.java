@@ -40,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
     private SwipeRefreshLayout refreshLayout;
     private LoggedUser loggedUser;
 
+    public static int REFRESH = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,6 +175,16 @@ public class HomeActivity extends AppCompatActivity {
         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, wall);
         lv.setAdapter(adapter);
         refreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //Only updates wall (followed users should always be up to date)
+        if(intent != null && intent.getExtras() != null && intent.getExtras().getInt("mode") == REFRESH){
+            Log.d("ajeje", "HomeActivity onRestart - REFRESH");
+            refreshLayout.setRefreshing(true);
+            wallCall();
+        }
     }
 
     @Override
