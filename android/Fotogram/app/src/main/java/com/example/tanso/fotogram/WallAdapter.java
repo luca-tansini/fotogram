@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,25 +18,34 @@ import com.example.tanso.fotogram.Model.Post;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 class WallAdapter extends ArrayAdapter<Post> {
 
+    private HashMap<String,View> cache;
+
     public WallAdapter(Context context, int
             resource, List<Post> items) {
         super(context, resource, items);
+        this.cache = new HashMap<>();
     }
 
+    //getView protocol has been overridden because
+    //recycling view for images with different sizes
+    //caused the list to twitch
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            LayoutInflater vi;
-            vi = LayoutInflater.from(getContext());
-            v = vi.inflate(R.layout.wall_entry, null);
-        }
         Post p = getItem(position);
         if (p != null) {
+            View v = cache.get(p.getUser().getUsername()+p.getTimestamp().toString());
+            if (v == null) {
+                LayoutInflater vi;
+                vi = LayoutInflater.from(getContext());
+                v = vi.inflate(R.layout.wall_entry, null);
+                cache.put(p.getUser().getUsername()+p.getTimestamp().toString(), v);
+            }
+
             new GetViewTask(v,p,getContext()).execute();
 
             //Username, description and date
@@ -45,8 +55,11 @@ class WallAdapter extends ArrayAdapter<Post> {
             description.setText(p.getDescription());
             TextView date = v.findViewById(R.id.wallPostDate);
             date.setText(getDateString(p.getTimestamp()));
+            return v;
         }
-        return v;
+        //Don't know how we get here but something bad will happen
+        Log.d("ajeje", "WallAdpter: NEVER GET HERE WARNING");
+        return null;
     }
 
     private String getDateString(Timestamp t){
