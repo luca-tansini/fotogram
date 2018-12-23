@@ -52,6 +52,11 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
+        //Set list header
+        ListView userWallLV = findViewById(R.id.userWall);
+        View header = getLayoutInflater().inflate(R.layout.user_profile_list_header, userWallLV, false);
+        userWallLV.addHeaderView(header, null, false);
+
         //Retrieve username from Intent
         String username = getIntent().getExtras().getString("username");
         user = new User(username, null);

@@ -14,80 +14,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/constraintLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bottom_border_rectangle"
-            app:layout_constraintBottom_toTopOf="@+id/swipeRefreshLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imageViewProfilePicture"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:scaleType="fitCenter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/textViewUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:maxWidth="150dp"
-                android:maxHeight="50dp"
-                android:text=""
-                android:textColor="@android:color/black"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toTopOf="@+id/buttonLogout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageViewProfilePicture"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/buttonLogout"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/round_shape"
-                android:backgroundTint="@color/colorUnfollow"
-                android:text="Logout"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageViewProfilePicture"
-                app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
-
-            <Button
-                android:id="@+id/buttonUpdatePicture"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/round_shape"
-                android:elevation="1dp"
-                android:drawableTop="@drawable/ic_plus_round"
-                android:paddingTop="3dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageViewProfilePicture"
-                app:layout_constraintEnd_toStartOf="@+id/imageViewProfilePicture"
-                app:layout_constraintHorizontal_bias="0.25"
-                app:layout_constraintStart_toEndOf="@+id/imageViewProfilePicture"
-                app:layout_constraintTop_toTopOf="@+id/imageViewProfilePicture"
-                app:layout_constraintVertical_bias="1.0" />
-
-        </android.support.constraint.ConstraintLayout>
-
         <android.support.v4.widget.SwipeRefreshLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/swipeRefreshLayout"
@@ -96,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ListView
                 android:id="@+id/userWall"
@@ -104,7 +30,8 @@
                 android:layout_height="match_parent"
                 android:fastScrollEnabled="true"
                 android:persistentDrawingCache="scrolling"
-                android:scrollingCache="false"></ListView>
+                android:scrollingCache="false">
+            </ListView>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -49,6 +49,11 @@ public class MyProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
 
+        //Set list header
+        ListView userWallLV = findViewById(R.id.userWall);
+        View header = getLayoutInflater().inflate(R.layout.myprofile_list_header,userWallLV, false);
+        userWallLV.addHeaderView(header, null, false);
+
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
         nav.setSelectedItemId(R.id.navigation_my_profile);

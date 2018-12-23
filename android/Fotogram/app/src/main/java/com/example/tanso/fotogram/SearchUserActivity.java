@@ -1,5 +1,6 @@
 package com.example.tanso.fotogram;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -96,12 +97,12 @@ public class SearchUserActivity extends AppCompatActivity {
                 if(u.getUsername().equals(Model.getInstance().getLoggedUser().getUsername())){
                     Intent myprofile = new Intent(getApplicationContext(), MyProfileActivity.class);
                     myprofile.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    getApplicationContext().startActivity(myprofile);
+                    startActivity(myprofile);
                 }
                 else{
                     Intent userprofile = new Intent(getApplicationContext(), UserProfileActivity.class);
                     userprofile.putExtra("username", u.getUsername());
-                    getApplicationContext().startActivity(userprofile);
+                    startActivity(userprofile);
                 }
             }
         });
