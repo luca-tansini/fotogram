@@ -92,7 +92,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 }
                             }
                             else
-                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user));
+                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_round_256));
 
                             //Set (Un)Follow Button
                             final Button buttonFollow = findViewById(R.id.buttonFollow);

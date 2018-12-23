@@ -39,7 +39,7 @@ class SuggestionAdapter extends ArrayAdapter<User> {
             if(u.getProfilePicture() != null && u.getProfilePicture() != null)
                 profilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getContext(), u.getProfilePicture()));
             else
-                profilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getContext(), BitmapFactory.decodeResource(getContext().getResources(),R.drawable.user)));
+                profilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getContext(), BitmapFactory.decodeResource(getContext().getResources(),R.drawable.user_round_256)));
             TextView suggestionUsername = v.findViewById(R.id.suggestionUsername);
             suggestionUsername.setText(u.getUsername());
         }

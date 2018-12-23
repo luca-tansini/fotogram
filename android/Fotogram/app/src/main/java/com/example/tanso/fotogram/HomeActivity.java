@@ -6,11 +6,15 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -46,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_home);
 
         //Cache logged user data
@@ -65,7 +70,6 @@ public class HomeActivity extends AppCompatActivity {
         nav.setSelectedItemId(R.id.navigation_home);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
-
 
         //Set wall listener
         ListView wall = findViewById(R.id.wall);
@@ -87,6 +91,13 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        //Set invisible empty wall header (just in case)
+        View header = getLayoutInflater().inflate(R.layout.empty_list_header,wall, false);
+        wall.addHeaderView(header, null, false);
+        TextView emptyMessage = findViewById(R.id.empty_list_message);
+        emptyMessage.setVisibility(View.GONE);
+        emptyMessage.setText("It's all quiet in here, go follow some friends or upload your own post!");
+
         //Show Wall
         followedCall();
 
@@ -98,6 +109,8 @@ public class HomeActivity extends AppCompatActivity {
     */
     private void followedCall(){
         refreshLayout.setRefreshing(true);
+        TextView emptyMessage = findViewById(R.id.empty_list_message);
+        emptyMessage.setVisibility(View.GONE);
         HashMap<String,String> params = new HashMap<>();
         params.put("session_id",loggedUser.getSessionId());
         FotogramAPI.makeAPICall(FotogramAPI.API.FOLLOWED, getApplicationContext(), params,
@@ -114,8 +127,8 @@ public class HomeActivity extends AppCompatActivity {
                                 if(j.get("name").equals(loggedUser.getUsername())) {
                                     if (!j.getString("picture").equals("null"))
                                         loggedUser.updateProfilePicture(Base64Images.base64toBitmap(j.getString("picture")));
-                                    loggedUser.setFollowing(following);
-                                }//Other users data
+                                }
+                                //Other users data
                                 else {
                                     String name = j.getString("name");
                                     if (!j.getString("picture").equals("null"))
@@ -124,6 +137,7 @@ public class HomeActivity extends AppCompatActivity {
                                         following.put(name, new User(name, null));
                                 }
                             }
+                            loggedUser.setFollowing(following);
                             wallCall();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -171,8 +185,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showWall(List<Post> wall){
-        //Set listview adapter
+
         ListView lv = findViewById(R.id.wall);
+
+        if(wall.size() == 0){
+            //TODO: handle empty wall case
+            TextView emptyMessage = findViewById(R.id.empty_list_message);
+            emptyMessage.setVisibility(View.VISIBLE);
+        }
+        //Set listview adapter
         WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, wall);
         lv.setAdapter(adapter);
         refreshLayout.setRefreshing(false);

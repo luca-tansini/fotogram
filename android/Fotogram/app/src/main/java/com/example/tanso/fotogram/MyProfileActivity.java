@@ -6,8 +6,11 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -47,12 +50,20 @@ public class MyProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_my_profile);
 
         //Set list header
         ListView userWallLV = findViewById(R.id.userWall);
         View header = getLayoutInflater().inflate(R.layout.myprofile_list_header,userWallLV, false);
         userWallLV.addHeaderView(header, null, false);
+
+        //Set invisible empty wall header (just in case)
+        View emptyListHeader = getLayoutInflater().inflate(R.layout.empty_list_header, userWallLV, false);
+        userWallLV.addHeaderView(emptyListHeader, null, false);
+        TextView emptyMessage = findViewById(R.id.empty_list_message);
+        emptyMessage.setVisibility(View.GONE);
+        emptyMessage.setText("This looks empty, go create your first post!");
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
@@ -101,6 +112,8 @@ public class MyProfileActivity extends AppCompatActivity {
     private void profileCall(){
         final ImageView imageViewProfilePicture = findViewById(R.id.imageViewProfilePicture);
         final ListView userWallLV = findViewById(R.id.userWall);
+        final TextView emptyMessage = findViewById(R.id.empty_list_message);
+        emptyMessage.setVisibility(View.GONE);
 
         HashMap<String,String> params = new HashMap<>();
         params.put("session_id", loggedUser.getSessionId());
@@ -120,7 +133,7 @@ public class MyProfileActivity extends AppCompatActivity {
                             if(loggedUser.getProfilePicture() != null)
                                 imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(), loggedUser.getProfilePicture()));
                             else
-                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_full));
+                                imageViewProfilePicture.setImageDrawable(CircularBitmapDrawableFactory.create(getApplicationContext(),R.drawable.user_round_256));
                             ArrayList<Post> userWall = new ArrayList<>();
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
@@ -128,6 +141,9 @@ public class MyProfileActivity extends AppCompatActivity {
                                     userWall.add(new Post(loggedUser, Base64Images.base64toBitmap(j.getString("img")), j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
                                 else
                                     userWall.add(new Post(loggedUser, null, j.getString("msg"), Timestamp.valueOf(j.getString("timestamp"))));
+                            }
+                            if(userWall.size() == 0){
+                                emptyMessage.setVisibility(View.VISIBLE);
                             }
                             WallAdapter adapter = new WallAdapter(getApplicationContext(), R.layout.wall_entry, userWall);
                             userWallLV.setAdapter(adapter);

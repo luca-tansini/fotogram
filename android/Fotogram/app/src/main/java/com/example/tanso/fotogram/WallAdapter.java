@@ -104,7 +104,7 @@ class GetViewTask extends AsyncTask<Void,Void,Drawable[]>{
         if(p.getUser().getProfilePicture() != null && p.getUser().getProfilePicture() != null)
             pics[0] = CircularBitmapDrawableFactory.create(context, p.getUser().getProfilePicture());
         else
-            pics[0] = CircularBitmapDrawableFactory.create(context, BitmapFactory.decodeResource(context.getResources(),R.drawable.user));
+            pics[0] = CircularBitmapDrawableFactory.create(context, BitmapFactory.decodeResource(context.getResources(),R.drawable.user_round_256));
         if(p.getImage() != null && p.getImage() != null)
             pics[1] = new BitmapDrawable(context.getResources(), p.getImage());
         else
