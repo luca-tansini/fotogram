@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_user_round" />
-                            <entry key="sourceFile" value="$PROJECT_DIR$/../../Images/user_round.svg" />
+                            <entry key="outputName" value="ic_eye" />
+                            <entry key="sourceFile" value="$PROJECT_DIR$/../../Images/eye.svg" />
                           </map>
                         </option>
                       </PersistentState>
