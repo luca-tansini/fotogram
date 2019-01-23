@@ -23,24 +23,23 @@
         android:id="@+id/buttonChooseFromGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/round_shape"
         android:backgroundTint="@color/colorFollow"
         android:text="Choose from gallery"
         app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewUpdateProfilePicture" />
+        app:layout_constraintStart_toEndOf="@+id/imageViewUpdateProfilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/errorTextView" />
 
     <ImageView
         android:id="@+id/imageViewUpdateProfilePicture"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginBottom="8dp"
         android:background="@drawable/border"
-        app:layout_constraintBottom_toTopOf="@+id/buttonChooseFromGallery"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintEnd_toStartOf="@+id/buttonChooseFromGallery"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
@@ -49,12 +48,14 @@
         android:id="@+id/errorTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@id/buttonChooseFromGallery"
+        app:layout_constraintBottom_toTopOf="@+id/buttonChooseFromGallery"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageViewUpdateProfilePicture" />
+        app:layout_constraintStart_toEndOf="@+id/imageViewUpdateProfilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

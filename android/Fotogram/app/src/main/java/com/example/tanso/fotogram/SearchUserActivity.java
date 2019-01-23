@@ -53,6 +53,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
+        Log.d("ajeje", "SearchUser - onCreate - setting nav to navigation_search_user");
         nav.setSelectedItemId(R.id.navigation_search_user);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
@@ -147,6 +148,7 @@ public class SearchUserActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         BottomNavigationView nav = findViewById(R.id.navigation);
+        Log.d("ajeje", "SearchUser - onRestart - setting nav to navigation_search_user");
         nav.setSelectedItemId(R.id.navigation_search_user);
     }
 }

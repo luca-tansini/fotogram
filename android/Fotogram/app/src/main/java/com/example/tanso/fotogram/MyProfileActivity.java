@@ -67,6 +67,7 @@ public class MyProfileActivity extends AppCompatActivity {
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
+        Log.d("ajeje", "MyProfile - onCreate - setting nav to navigation_my_profile");
         nav.setSelectedItemId(R.id.navigation_my_profile);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
@@ -193,6 +194,7 @@ public class MyProfileActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         BottomNavigationView nav = findViewById(R.id.navigation);
+        Log.d("ajeje", "MyProfile - onRestart - setting nav to navigation_my_profile");
         nav.setSelectedItemId(R.id.navigation_my_profile);
     }
 }
