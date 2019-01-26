@@ -55,7 +55,6 @@ public class UploadActivity extends AppCompatActivity {
 
         //Navigation
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "UploadActivity - onCreate - setting nav to navigation_upload");
         nav.setSelectedItemId(R.id.navigation_upload);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
@@ -106,7 +105,6 @@ public class UploadActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "UploadActivity - onRestart - setting nav to navigation_upload");
         nav.setSelectedItemId(R.id.navigation_upload);
     }
 

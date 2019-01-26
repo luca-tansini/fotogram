@@ -37,88 +37,122 @@ public class LoginActivity extends AppCompatActivity {
         String sessionId = settings.getString("sessionId", "");
         String username = settings.getString("username", "");
         if(!sessionId.equals("") && !username.equals("")){
-            startHome(sessionId, username);
+            //Controlla che le credenziali siano ancora valide
+            checkCredentials(sessionId, username);
         }
         else {
-
-            setContentView(R.layout.activity_login);
-
-            //Set login form
-            final Button loginButton = findViewById(R.id.buttonLogin);
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    login();
-                }
-            });
-            loginButton.setEnabled(false);
-            final TextView error = findViewById(R.id.textViewError);
-            final EditText usernameET = findViewById(R.id.editTextUsername);
-            final EditText passwordET = findViewById(R.id.editTextPassword);
-            usernameET.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (s.toString().length() > 0 && passwordET.getText().length() > 0)
-                        loginButton.setEnabled(true);
-                    else
-                        loginButton.setEnabled(false);
-                    error.setText("");
-                }
-            });
-            passwordET.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (s.toString().length() > 0 && usernameET.getText().length() > 0)
-                        loginButton.setEnabled(true);
-                    else
-                        loginButton.setEnabled(false);
-                    error.setText("");
-                }
-            });
-
-            //Set show password toggle
-            passwordET.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_eye, 0);
-            passwordET.setCompoundDrawableTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorDisabled)));
-            passwordET.setOnTouchListener(new View.OnTouchListener() {
-
-                final int DRAWABLE_RIGHT = 2;
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                        if(event.getRawX() >= (passwordET.getRight() - passwordET.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                            passwordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                            return true;
-                        }
-                    }
-                    if(event.getAction() == MotionEvent.ACTION_UP) {
-                        if(event.getRawX() >= (passwordET.getRight() - passwordET.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                            passwordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-
-
+            //Mostra la activity di login
+            showLoginForm();
         }
+    }
+
+    private void showLoginForm() {
+        setContentView(R.layout.activity_login);
+
+        //Set login form
+        final Button loginButton = findViewById(R.id.buttonLogin);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login();
+            }
+        });
+        loginButton.setEnabled(false);
+        final TextView error = findViewById(R.id.textViewError);
+        final EditText usernameET = findViewById(R.id.editTextUsername);
+        final EditText passwordET = findViewById(R.id.editTextPassword);
+        usernameET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() > 0 && passwordET.getText().length() > 0)
+                    loginButton.setEnabled(true);
+                else
+                    loginButton.setEnabled(false);
+                error.setText("");
+            }
+        });
+        passwordET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() > 0 && usernameET.getText().length() > 0)
+                    loginButton.setEnabled(true);
+                else
+                    loginButton.setEnabled(false);
+                error.setText("");
+            }
+        });
+
+        //Set show password toggle
+        passwordET.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_eye, 0);
+        passwordET.setCompoundDrawableTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorDisabled)));
+        passwordET.setOnTouchListener(new View.OnTouchListener() {
+
+            final int DRAWABLE_RIGHT = 2;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if(event.getRawX() >= (passwordET.getRight() - passwordET.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        passwordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        return true;
+                    }
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (passwordET.getRight() - passwordET.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        passwordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+    //Metodo che fa una chiamata REST a caso per verificare il sid memorizzato
+    //Se è valida chiama startHome, altrimenti chiama showLoginForm
+    private void checkCredentials(final String sessionId, final String username) {
+        final boolean res = true;
+        HashMap<String,String> params = new HashMap<>();
+        params.put("session_id",sessionId);
+        params.put("usernamestart",username);
+        params.put("limit","1");
+        FotogramAPI.makeAPICall(FotogramAPI.API.USERS, getApplicationContext(), params,
+                new ResponseCode() {
+                    @Override
+                    public void run(String response) {
+                        startHome(sessionId, username);
+                    }
+                },
+                new ErrorCode() {
+                    @Override
+                    public void run(VolleyError error) {
+                        showLoginForm();
+                        TextView errorTV = findViewById(R.id.textViewError);
+                        errorTV.setText("session expired, please login again");
+                        SharedPreferences settings = getSharedPreferences(getString(R.string.shared_preferences_filename), 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.remove("sessionId");
+                        editor.remove("username");
+                        editor.commit();
+                    }
+                }
+        );
     }
 
     private void login(){

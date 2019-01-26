@@ -53,7 +53,6 @@ public class SearchUserActivity extends AppCompatActivity {
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "SearchUser - onCreate - setting nav to navigation_search_user");
         nav.setSelectedItemId(R.id.navigation_search_user);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
@@ -130,7 +129,8 @@ public class SearchUserActivity extends AppCompatActivity {
                                 JSONObject j = (JSONObject) jsonArray.get(i);
                                 if(!j.getString("picture").equals("null"))
                                     users.add(new User(j.getString("name"), Base64Images.base64toBitmap(j.getString("picture"))));
-                                users.add(new User(j.getString("name"), null));
+                                else
+                                    users.add(new User(j.getString("name"), null));
                             }
                             SuggestionAdapter suggestionAdapter = new SuggestionAdapter(getApplicationContext(), R.layout.suggestion_entry, users);
                             ListView suggestionList = findViewById(R.id.suggestionList);
@@ -148,7 +148,6 @@ public class SearchUserActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "SearchUser - onRestart - setting nav to navigation_search_user");
         nav.setSelectedItemId(R.id.navigation_search_user);
     }
 }

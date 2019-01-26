@@ -67,7 +67,6 @@ public class HomeActivity extends AppCompatActivity {
 
         //Bottom navigation bar management
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "HomeActivity - onCreate - setting nav to navigation_home");
         nav.setSelectedItemId(R.id.navigation_home);
         myNavigationItemSelectedListener = new MyNavigationItemSelectedListener(this);
         nav.setOnNavigationItemSelectedListener(myNavigationItemSelectedListener);
@@ -206,7 +205,7 @@ public class HomeActivity extends AppCompatActivity {
         if(intent != null && intent.getExtras() != null && intent.getExtras().getInt("mode") == REFRESH){
             Log.d("ajeje", "HomeActivity onRestart - REFRESH");
             refreshLayout.setRefreshing(true);
-            wallCall();
+            followedCall();
         }
     }
 
@@ -214,7 +213,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         BottomNavigationView nav = findViewById(R.id.navigation);
-        Log.d("ajeje", "HomeActivity - onRestart - setting nav to navigation_home");
         nav.setSelectedItemId(R.id.navigation_home);
     }
 }
