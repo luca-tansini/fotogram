@@ -8,13 +8,33 @@
 
 .page{}
 
-.login-page{
-    display: flex;
+.profile-picture{
+    border-radius:50%;
+    height:40px;
+    width:40px;
+    object-position: center;
+    object-fit: cover;
+}
+
+.upload-image{
+    height:300px;
+    width:300px;
+    object-position: center;
+    object-fit: contain;
+}
+
+.center{
+    height: max-content;
+    width: max-content;
+    margin: 0;
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width:60%;
-    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.center-horizontal{
+    width: max-content;
+    margin-left: 50%;
+    transform: translate(-50%, 0%);
 }

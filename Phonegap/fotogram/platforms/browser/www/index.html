@@ -6,54 +6,91 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script type="text/javascript" src="cordova.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/index.css"/>
+    <script src="js/Model.js"></script>
     <script src="js/index.js"></script>
     <title>Fotogram</title>
 </head>
 <body>
-    <div id="loginPage" class="page container-fluid m-auto flex-column justify-content-center login-page">
+    <!--LOGIN PAGE-->
+    <div id="loginPage" class="page container-fluid center">
         <p class="pb-5" style="font-style: oblique; font-size: 48px; text-align: center"><strong>
             Fotogram
         </strong></p>
         <form>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" class="form-control" id="inputUsername" placeholder="Username">
+            <div class="form-group center-horizontal">
+                <label class="mb-0">Username</label>
+                <input type="text" class="form-control" style="width: 225px;" id="inputUsername" placeholder="Username">
             </div>
-            <div class="form-group">
-                <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+            <div class="form-group center-horizontal">
+                <label class="mb-0" for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" style="width: 225px;" id="inputPassword" placeholder="Password">
             </div>
-            <p id="errorText" style="color:red">
+            <p id="errorText" style="color:red; text-align: center;">
             </p>
-            <button type="button" class="btn btn-primary" id="loginButton">Login</button>
+            <button type="button" class="btn btn-primary center-horizontal" style="width:100px" id="loginButton">Login</button>
         </form>
     </div>
+    <!--HOME PAGE-->
     <div id="home" class="page">
-        <p>Benvenuto!</p>
+        <ul id="wall" class="list-group pb-5">
+        </ul>
     </div>
+    <!--UPLOAD PAGE-->
+    <div id="upload" class="page">
+        <div class="center" style="height: max-content; width: 300px;">
+            <img id="img" class="upload-image"/>
+            <button id="uploadImageButton" class="btn btn-primary mt-3 center-horizontal">Upload Image</button><br>
+        </div>
+    </div>
+    <!--SEARCH USER PAGE-->
     <div id="searchUser" class="page">
         <p>Riempi questo campo per cercare un utente</p>
         <input type="text" id="inputText" placeholder="username"/>
     </div>
+    <!--MY PROFILE PAGE-->
     <div id="myProfile" class="page">
         <p>Va che bello il tuo profilo!</p>
         <img src="img/logo.png" style="border-radius:50%; height:200px; width:200px"/>
     </div>
-    <nav id="bottomNavigation" class="nav nav-light bg-light fixed-bottom justify-content-around align-items-center" style="height:50px">
-        <li class="nav-item">
-            <a id="navHome" class="nav-link my-nav" href="#">Home</a>
+    <!--NAVBAR-->
+    <nav id="bottomNavigation" class="nav fixed-bottom justify-content-around align-items-center" style="height:60px; background-color: black">
+        <li>
+            <a id="navHome" href="#">
+                <div>
+                    <img class="center-horizontal" src="img/home.svg" style="height:28px; width:28px;"/>
+                    <p style="font-size:12px; color:white; margin-bottom:0;">Home</p>
+                </div>
+            </a>
         </li>
-        <li class="nav-item">
-            <a id="navSearchUser" class="nav-link my-nav" href="#">Search User</a>
+        <li>
+            <a id="navUpload" href="#">
+                <div>
+                    <img class="center-horizontal" src="img/upload.svg" style="height:28px; width:28px;"/>
+                    <p style="font-size:12px; color:white; margin-bottom:0;">Upload</p>
+                </div>
+            </a>
         </li>
-        <li class="nav-item">
-            <a id="navMyProfile" class="nav-link my-nav" href="#">My Profile</a>
+        <li>
+            <a id="navSearchUser" href="#">
+                <div>
+                    <img class="center-horizontal" src="img/search.svg" style="height:28px; width:28px;"/>
+                    <p style="font-size:12px; color:white; margin-bottom:0;">Search User</p>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a id="navMyProfile" href="#">
+                <div>
+                    <img class="center-horizontal" src="img/user.svg" style="height:28px; width:28px;"/>
+                    <p style="font-size:12px; color:white; margin-bottom:0;">My Profile</p>
+                </div>
+            </a>
         </li>
     </nav>
 </body>
