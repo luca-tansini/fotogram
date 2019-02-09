@@ -11,13 +11,39 @@ class User{
     get profilePicture(){
         return this._profilePicture;
     }
+
+    set profilePicture(profilePicture){
+        this._profilePicture = profilePicture;
+    }
+
+}
+
+class LoggedUser extends User {
+    constructor(uid, profilePicture=undefined,sessionid) {
+        super(uid,profilePicture);
+        this._sessionid = sessionid;
+    }
+
+    get sessionid(){
+        return this._sessionid;
+    }
+
+    setFollowing(following){
+        this._following = following;
+    }
+
+    getFollowing(){
+        return this._following;
+    }
+
 }
 
 class Post{
-    constructor(user, picture, description){
+    constructor(user, picture, description, timestamp){
         this._user = user;
         this._picture = picture;
         this._description = description;
+        this._timestamp = timestamp;
     }
 
     get user(){
@@ -31,10 +57,35 @@ class Post{
     get description(){
         return this._description;
     }
+
+    get timestamp(){
+        return this._timestamp;
+    }
+
 }
 
-var user1 = new User("froggo","img/rana_xs.jpg");
-var user2 = new User("doggo","img/cane_xs.jpg");
-var user3 = new User("bojack","img/cavallo_xs.jpg");
+class Model{
 
-var model = [new Post(user1,"img/pastry_xs.jpg","pasticcini"), new Post(user2,"img/arance_xs.jpg","arance"), new Post(user1,"img/palloncini_xs.jpg","palloncini"), new Post(user3,"img/chitarra_xs.jpg","guitar")];
+    constructor(){}
+
+    getLoggedUser(){
+        return this._loggedUser;
+    }
+
+    setLoggedUser(loggedUser){
+        this._loggedUser = loggedUser;
+    }
+
+}
+
+var model = (function(){
+	var instance;
+	return {
+		getInstance: function() {
+			if (!instance) {
+				instance = new Model();
+			}
+			return instance;
+		}
+	};
+})();

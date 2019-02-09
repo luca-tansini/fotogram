@@ -2,11 +2,9 @@
     background-color: inherit;
 }
 
-.my-nav.current{
-    background-color: lightgreen;
+.page{
+    margin-top: 50px;
 }
-
-.page{}
 
 .profile-picture{
     border-radius:50%;
@@ -15,6 +13,8 @@
     object-position: center;
     object-fit: cover;
 }
+
+.home-post{}
 
 .upload-image{
     height:300px;

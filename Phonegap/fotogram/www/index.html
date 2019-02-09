@@ -17,6 +17,13 @@
     <title>Fotogram</title>
 </head>
 <body>
+    <!--HEADER TOOLBAR-->
+    <div id="toolbar" class="fixed-top d-flex" style="height: 50px; background-color: black;">
+        <button id="backButton" style="display: none; height: 50px; width: 75px; background-color:black; border:none">
+            <img style="height: 27px;" src="img/left-arrow.svg"/>
+        </button>
+        <p id="toolbarTitle" class="flex-grow-1" style="color: white; font-style: oblique; font-size: 22px; text-align: center; margin-top:10px"><strong>Fotogram</strong></p>
+    </div>
     <!--LOGIN PAGE-->
     <div id="loginPage" class="page container-fluid center">
         <p class="pb-5" style="font-style: oblique; font-size: 48px; text-align: center"><strong>
@@ -55,8 +62,13 @@
     </div>
     <!--MY PROFILE PAGE-->
     <div id="myProfile" class="page">
-        <p>Va che bello il tuo profilo!</p>
-        <img src="img/logo.png" style="border-radius:50%; height:200px; width:200px"/>
+        <ul id="myProfileWall" class="list-group pb-5">
+        </ul>
+    </div>
+    <!--USER PROFILE PAGE-->
+    <div id="userProfile" class="page">
+        <ul id="userProfileWall" class="list-group pb-5">
+        </ul>
     </div>
     <!--NAVBAR-->
     <nav id="bottomNavigation" class="nav fixed-bottom justify-content-around align-items-center" style="height:60px; background-color: black">
