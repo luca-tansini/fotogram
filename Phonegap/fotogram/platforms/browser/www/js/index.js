@@ -68,6 +68,7 @@ function home(){
     $(".page").hide();
     $("#home").show();
     $("#wall").empty();
+    $("#homeLoader").show();
 
     //Followed REST API call
     let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid};
@@ -85,7 +86,6 @@ function home(){
                     following[user.name] = new User(user.name,user.picture);
             }
             model.getInstance().getLoggedUser().setFollowing(following);
-            console.log(following);
             showWall();
         },
         error: function(error){
@@ -109,6 +109,7 @@ function showWall(){
                 else
                     wall.push(new Post(model.getInstance().getLoggedUser().getFollowing()[post.user], post.img, post.msg, post.timestamp));
             }
+            $("#homeLoader").hide();
             for(post of wall){
                 $("#wall").append(makeHomePost(post));
             }
@@ -121,7 +122,7 @@ function showWall(){
 
 //TODO: manca timestamp
 function makeHomePost(post){
-    let html = '<li data-username="'+post.user.uid+'" class="home-post list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 col-12 px-0">\n<img class="profile-picture" src="';
+    let html = '<li data-username="'+post.user.uid+'" class="home-post list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
     html += base64toSrc(post.user.profilePicture);
     html += '"/>\n<p id="username" class="col-8 pt-2">';
     html += post.user.uid;
@@ -141,7 +142,6 @@ function base64toSrc(imgBase64){
 
 function homePostListener(){
     let username = $(this).data("username");
-    console.log(username);
     //Se il post è dell'utente loggato va a myProfile
     if(model.getInstance().getLoggedUser().uid == username){
         myProfile();
@@ -162,23 +162,51 @@ function searchUser(){
     $("#searchUser").show();
 }
 
+function profileAPICall(username, onSuccessLogic){
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'username':username};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/profile",
+        data: myData,
+        success: function(resultData){
+            json = JSON.parse(resultData);
+            let user = new User(json.username, json.img);
+            let userwall = [];
+            for(post of json.posts){
+                userwall.push(new Post(user, post.img, post.msg, post.timestamp));
+            }
+            let profileData = {'user':user, 'userwall':userwall};
+            onSuccessLogic(profileData);
+        },
+        error: function(error){
+            console.log("error in profile call: "+error);
+        }
+    });
+}
+
 function myProfile(){
     $(".page").hide();
     $("#myProfile").show();
     $("#myProfileWall").empty();
-    let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
-    html += base64toSrc(model.getInstance().getLoggedUser().profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div class="d-flex align-items-center justify-content-center col-8 flex-column pt-3">';
-    html += '<p>'+model.getInstance().getLoggedUser().uid+'</p>';
-    html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> </div> </li>';
-    $("#myProfileWall").append(html);
-    for(post of model.getInstance().getHomeWall()){
-        if(post.user.uid == model.getInstance().getLoggedUser().uid)
-            $("#myProfileWall").append(makeProfilePost(post));
-    }
+    $("#myProfileLoader").show();
+    profileAPICall(model.getInstance().getLoggedUser().uid,
+        function(profileData){
+            let latestProfilePic = profileData.user.profilePicture;
+            model.getInstance().getLoggedUser().profilePicture = latestProfilePic;
+            let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
+            html += base64toSrc(model.getInstance().getLoggedUser().profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
+            html += '<p>'+model.getInstance().getLoggedUser().uid+'</p>';
+            html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> <div style="flex:1;"></div> </div> </li>';
+            $("#myProfileWall").append(html);
+            $("#myProfileLoader").hide();
+            for(post of profileData.userwall){
+                $("#myProfileWall").append(makeProfilePost(post));
+            }
+        });
 }
 
 function makeProfilePost(post){
-    let html = '<li data-username="'+post.user.uid+'" class="list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 col-12 px-0">\n<img class="profile-picture" src="';
+    let html = '<li data-username="'+post.user.uid+'" class="list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
     html += base64toSrc(post.user.profilePicture);
     html += '"/>\n<p id="username" class="col-8 pt-2">';
     html += post.user.uid;
@@ -211,20 +239,21 @@ function userProfile(username){
         home();
     });
     $("#userProfileWall").empty();
-    let user = undefined;
-    for(u of model.getInstance().getLoggedUser().getFollowing()){
-        if (u.uid == username) {
-            user = u;
-            break;
-        }
-    }
-    let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
-    html += base64toSrc(user.profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div class="d-flex align-items-center justify-content-center col-8 flex-column pt-3">';
-    html += '<p>'+user.uid+'</p>';
-    html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">unfollow</button> </div> </div> </li>';
-    $("#userProfileWall").append(html);
-    for(post of model.getInstance().getHomeWall()){
-        if(post.user.uid == user.uid)
-            $("#userProfileWall").append(makeProfilePost(post));
-    }
+    $("#userProfileLoader").show();
+
+    profileAPICall(username,
+        function(profileData){
+            let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
+            html += base64toSrc(profileData.user.profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
+            html += '<p>'+username+'</p>';
+            if(model.getInstance().getLoggedUser().getFollowing()[username])
+                html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">unfollow</button> </div> <div style="flex:1;"> </div> </li>';
+            else
+                html += '<button class="btn btn-primary" style="background-color: #007bff; color: black; border: none; width: 100px; height: 30px;">follow</button> </div> <div style="flex:1;"> </div> </li>';
+            $("#userProfileWall").append(html);
+            $("#userProfileLoader").hide();
+            for(post of profileData.userwall){
+                $("#userProfileWall").append(makeProfilePost(post));
+            }
+        });
 }
