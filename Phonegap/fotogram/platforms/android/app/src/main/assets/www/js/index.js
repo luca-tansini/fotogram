@@ -1,26 +1,22 @@
 $(document).ready(docReady);
 
 function docReady(){
-
-    /*let user1 = new LoggedUser("froggo","img/rana_xs.jpg","sid42");
-    let user2 = new User("doggo","img/cane_xs.jpg");
-    let user3 = new User("bojack","img/cavallo_xs.jpg");
-    user1.setFollowing([user2,user3]);
-
-    model.getInstance().setHomeWall([new Post(user1,"img/pastry_xs.jpg","pasticcini"), new Post(user2,"img/arance_xs.jpg","arance"), new Post(user1,"img/palloncini_xs.jpg","palloncini"), new Post(user3,"img/chitarra_xs.jpg","guitar")]);
-    model.getInstance().setLoggedUser(user1);*/
-
     $(".page").hide();
     $("#bottomNavigation").hide();
     $("#loginPage").show();
     $("#loginButton").on("click", loginButtonClick);
-    $("#navHome").on("click",home);
-    $("#navUpload").on("click",upload);
-    $("#navSearchUser").on("click",searchUser);
-    $("#navMyProfile").on("click",myProfile);
+    $("#navHome").on("click",function(){hideBackButton(); home()});
+    $("#navUpload").on("click",function(){hideBackButton(); upload()});
+    $("#navSearchUser").on("click",function(){hideBackButton(); searchUser()});
+    $("#navMyProfile").on("click",function(){hideBackButton(); myProfile()});
     $("#uploadImageButton").on("click",uploadImage);
     $(document).on("click",".home-post", homePostListener);
+    $(document).on("click","#logoutButton", logoutButtonClick);
+    $(document).on("click","#followButton", followButtonClick);
+    $(document).on("click","#unfollowButton", unfollowButtonClick);
 }
+
+/************************************LOGIN*************************************/
 
 function loginButtonClick(){
     $("#errorText").html("");
@@ -47,22 +43,12 @@ function loginButtonClick(){
     }
 }
 
-// mostra il bottone indietro e gli assegna il comportamento
-// alla fine del comportamento cancella l'handler e nasconde il bottone
-function showBackButton(logic){
-    $("#backButton").show();
-    $("#toolbarTitle").css({marginLeft: "-75px"});
-    $("#backButton").on("click", function(){
-        logic();
-        $(document).off("click", "#backButton");
-        hideBackButton();
-    })
+function clearLoginPage(){
+    $("#inputUsername").val("");
+    $("#inputPassword").val("");
 }
 
-function hideBackButton(){
-    $("#backButton").hide();
-    $("#toolbarTitle").css({marginLeft: "0px"});
-}
+/*************************************HOME*************************************/
 
 function home(){
     $(".page").hide();
@@ -124,20 +110,14 @@ function showWall(){
 function makeHomePost(post){
     let html = '<li data-username="'+post.user.uid+'" class="home-post list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
     html += base64toSrc(post.user.profilePicture);
-    html += '"/>\n<p id="username" class="col-8 pt-2">';
+    html += '"/>\n<p class="col-8 pt-2">';
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '" id="postPicture"/>\n</div>\n<div class="row">\n<p id="description" class="col-12 px-0" style="font-size:14px">'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="font-size:14px">'
     html += post.description;
     html += '</p>\n</div>\n</li>'
     return html;
-}
-
-function base64toSrc(imgBase64){
-    if(imgBase64.substring(0,10) != "data:image")
-        return 'data:image/jpeg;base64,'+imgBase64;
-    return imgBase64;
 }
 
 function homePostListener(){
@@ -152,15 +132,47 @@ function homePostListener(){
     }
 }
 
+function clearHomePage(){
+    $("#wall").empty();
+}
+
+/************************************UPLOAD************************************/
+
 function upload(){
     $(".page").hide();
     $("#upload").show();
 }
 
+function uploadImage(){
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
+    destinationType: Camera.DestinationType.DATA_URL, sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+    });
+}
+
+function onSuccess(imageData) {
+    $("#uploadImg").attr("src","data:image/jpeg;base64," + imageData);
+}
+
+function onFail(message) {
+    console.log('uploadImage failed because: ' + message);
+}
+
+function clearUploadPage(){
+    $("#uploadImg").removeAttr("src");
+}
+
+/*********************************SEARCH USER**********************************/
+
 function searchUser(){
     $(".page").hide();
     $("#searchUser").show();
 }
+
+function clearSearchUserPage(){
+    $("#inputSearchUser").val("");
+}
+
+/**************************MY PROFILE & USER PROFILE***************************/
 
 function profileAPICall(username, onSuccessLogic){
     let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'username':username};
@@ -193,10 +205,10 @@ function myProfile(){
         function(profileData){
             let latestProfilePic = profileData.user.profilePicture;
             model.getInstance().getLoggedUser().profilePicture = latestProfilePic;
-            let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
+            let html = '<li class=border-bottom> <div class="row col-12 pb-3"> <img id="myProfilePicture" src="';
             html += base64toSrc(model.getInstance().getLoggedUser().profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
             html += '<p>'+model.getInstance().getLoggedUser().uid+'</p>';
-            html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> <div style="flex:1;"></div> </div> </li>';
+            html += '<button id="logoutButton" class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> <div style="flex:1;"></div> </div> </li>';
             $("#myProfileWall").append(html);
             $("#myProfileLoader").hide();
             for(post of profileData.userwall){
@@ -208,28 +220,34 @@ function myProfile(){
 function makeProfilePost(post){
     let html = '<li data-username="'+post.user.uid+'" class="list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
     html += base64toSrc(post.user.profilePicture);
-    html += '"/>\n<p id="username" class="col-8 pt-2">';
+    html += '"/>\n<p class="col-8 pt-2">';
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '" id="postPicture"/>\n</div>\n<div class="row">\n<p id="description" class="col-12 px-0" style="font-size:14px">'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="font-size:14px">'
     html += post.description;
     html += '</p>\n</div>\n</li>'
     return html;
 }
 
-function uploadImage(){
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
-    destinationType: Camera.DestinationType.DATA_URL, sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+function logoutButtonClick(){
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/logout",
+        data: myData,
+        success: function(resultData){
+            //TODO: persistenza
+            model.instance = undefined;
+            $(".page").hide();
+            $("#bottomNavigation").hide();
+            clearAllPages();
+            $("#loginPage").show();
+        },
+        error: function(error){
+            console.log("error in logout call: "+error);
+        }
     });
-}
-
-function onSuccess(imageData) {
-    $("#img").attr("src","data:image/jpeg;base64," + imageData);
-}
-
-function onFail(message) {
-    console.log('uploadImage failed because: ' + message);
 }
 
 function userProfile(username){
@@ -243,17 +261,85 @@ function userProfile(username){
 
     profileAPICall(username,
         function(profileData){
-            let html = '<li class=border-bottom> <div id="profileHeader" class="row col-12 pb-3"> <img id="profilePicture" src="';
+            let html = '<li class=border-bottom> <div class="row col-12 pb-3"> <img id="userProfilePicture" src="';
             html += base64toSrc(profileData.user.profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
             html += '<p>'+username+'</p>';
             if(model.getInstance().getLoggedUser().getFollowing()[username])
-                html += '<button class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">unfollow</button> </div> <div style="flex:1;"> </div> </li>';
+                html += '<button id="unfollowButton" data-username="'+username+'" class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">unfollow</button> </div> <div style="flex:1;"> </div> </li>';
             else
-                html += '<button class="btn btn-primary" style="background-color: #007bff; color: black; border: none; width: 100px; height: 30px;">follow</button> </div> <div style="flex:1;"> </div> </li>';
+                html += '<button id="followButton" data-username="'+username+'" class="btn btn-primary" style="background-color: #007bff; color: black; border: none; width: 100px; height: 30px;">follow</button> </div> <div style="flex:1;"> </div> </li>';
             $("#userProfileWall").append(html);
             $("#userProfileLoader").hide();
             for(post of profileData.userwall){
                 $("#userProfileWall").append(makeProfilePost(post));
             }
         });
+}
+
+function followButtonClick(){
+    let username = $(this).data("username");
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'username':username};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/follow",
+        data: myData,
+        success: function(resultData){
+            let pic = $("#userProfilePicture").attr("src");
+            model.getInstance().getLoggedUser().getFollowing()[username] = new User(username,pic);
+            userProfile(username);
+        },
+        error: function(error){
+            console.log("error in logout call: "+error);
+        }
+    });
+}
+
+function unfollowButtonClick(){
+    let username = $(this).data("username");
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'username':username};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/unfollow",
+        data: myData,
+        success: function(resultData){
+            delete model.getInstance().getLoggedUser().getFollowing()[username];
+            userProfile(username);
+        },
+        error: function(error){
+            console.log("error in logout call: "+error);
+        }
+    });
+}
+
+/********************************MISCELLANEOUS*********************************/
+
+// mostra il bottone indietro e gli assegna il comportamento
+// alla fine del comportamento cancella l'handler e nasconde il bottone
+function showBackButton(logic){
+    $("#backButton").show();
+    $("#toolbarTitle").css({marginLeft: "-75px"});
+    $('#backButton').off("click");
+    $("#backButton").on("click", function(){
+        logic();
+        hideBackButton();
+    });
+}
+
+function hideBackButton(){
+    $('#backButton').off("click");
+    $("#backButton").hide();
+    $("#toolbarTitle").css({marginLeft: "0px"});
+}
+
+function clearAllPages(){
+    clearLoginPage();
+    clearHomePage();
+    clearUploadPage();
+    clearSearchUserPage();
+}
+
+function base64toSrc(imgBase64){
+    if(imgBase64.substring(0,10) != "data:image")
+        return 'data:image/jpeg;base64,'+imgBase64;
+    return imgBase64;
 }
