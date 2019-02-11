@@ -3,17 +3,71 @@ $(document).ready(docReady);
 function docReady(){
     $(".page").hide();
     $("#bottomNavigation").hide();
-    $("#loginPage").show();
     $("#loginButton").on("click", loginButtonClick);
-    $("#navHome").on("click",function(){hideBackButton(); home()});
-    $("#navUpload").on("click",function(){hideBackButton(); upload()});
-    $("#navSearchUser").on("click",function(){hideBackButton(); searchUser()});
-    $("#navMyProfile").on("click",function(){hideBackButton(); myProfile()});
+
+    $("#navHome").on("click",function(){
+        hideBackButton();
+        $(".tanso-nav-link").css("color","white");
+        $("#homeNavLink").css("color","#007bff");
+        home();
+    });
+
+    $("#navUpload").on("click",function(){
+        hideBackButton();
+        $(".tanso-nav-link").css("color","white");
+        $("#uploadNavLink").css("color","#007bff");
+        upload();
+    });
     $("#uploadImageButton").on("click",uploadImage);
+
+    $("#navSearchUser").on("click",function(){
+        hideBackButton();
+        $(".tanso-nav-link").css("color","white");
+        $("#searchUserNavLink").css("color","#007bff");
+        searchUser();
+    });
+    $("#inputSearchUser").on("input",inputSearchUser);
+    $(document).on("click",".search-user-list-item", searchUserListener);
+
+    $("#navMyProfile").on("click",function(){
+        hideBackButton();
+        $(".tanso-nav-link").css("color","white");
+        $("#myProfileNavLink").css("color","#007bff");
+        myProfile();
+    });
     $(document).on("click",".home-post", homePostListener);
     $(document).on("click","#logoutButton", logoutButtonClick);
+
     $(document).on("click","#followButton", followButtonClick);
     $(document).on("click","#unfollowButton", unfollowButtonClick);
+
+    if(localStorage.getItem("username") && localStorage.getItem("sessionid")){
+        let username = localStorage.getItem("username");
+        let sessionid = localStorage.getItem("sessionid");
+
+        //Expired sessionid check
+        let myData = { 'session_id': sessionid};
+        $.ajax({
+            type: 'POST',
+            url: "https://ewserver.di.unimi.it/mobicomp/fotogram/followed",
+            data: myData,
+            success: function(resultData){
+                model.getInstance().setLoggedUser(new LoggedUser(username,undefined,sessionid));
+                console.log(sessionid);
+                $("#bottomNavigation").show();
+                home();
+            },
+            error: function(error){
+                localStorage.removeItem("sessionid");
+                localStorage.removeItem("username");
+                $("#loginPage").show();
+                $("#errorText").html("session expired");
+            }
+        });
+    }
+    else{
+        $("#loginPage").show();
+    }
 }
 
 /************************************LOGIN*************************************/
@@ -31,6 +85,8 @@ function loginButtonClick(){
             url: "https://ewserver.di.unimi.it/mobicomp/fotogram/login",
             data: myData,
             success: function(resultData){
+                localStorage.setItem("username",username);
+                localStorage.setItem("sessionid",resultData);
                 model.getInstance().setLoggedUser(new LoggedUser(username,undefined,resultData));
                 console.log(resultData);
                 $("#bottomNavigation").show();
@@ -128,6 +184,9 @@ function homePostListener(){
     }
     //Altrimenti va a userProfile
     else{
+        showBackButton(function(){
+            home();
+        });
         userProfile(username);
     }
 }
@@ -168,8 +227,54 @@ function searchUser(){
     $("#searchUser").show();
 }
 
+function inputSearchUser(){
+    let prefix = $(this).val();
+    $("#searchUserList").empty();
+    if(prefix != ""){
+        let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'usernamestart':prefix};
+        $.ajax({
+            type: 'POST',
+            url: "https://ewserver.di.unimi.it/mobicomp/fotogram/users",
+            data: myData,
+            success: function(resultData){
+                json = JSON.parse(resultData);
+                for(user of json.users){
+                    let html = '<li data-username="'+user.name+'" class="search-user-list-item list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
+                    if(!user.picture || user.picture == ""){
+                        html += 'img/user.png';
+                    }
+                    else{
+                        html += base64toSrc(user.picture);
+                    }
+                    html += '"/>\n<p class="col-8 pt-2">';
+                    html += user.name;
+                    html += '</p>\n</div>\n</li>'
+                    $("#searchUserList").append(html);
+                }
+            },
+            error: function(error){
+                console.log("error in profile call: "+error);
+            }
+        });
+    }
+}
+
+function searchUserListener(){
+    let username = $(this).data("username");
+    if(username == model.getInstance().getLoggedUser().uid){
+        myProfile();
+    }
+    else{
+        showBackButton(function(){
+            searchUser();
+        });
+        userProfile(username);
+    }
+}
+
 function clearSearchUserPage(){
     $("#inputSearchUser").val("");
+    $("#searchUserList").empty();
 }
 
 /**************************MY PROFILE & USER PROFILE***************************/
@@ -239,6 +344,8 @@ function logoutButtonClick(){
         success: function(resultData){
             //TODO: persistenza
             model.instance = undefined;
+            localStorage.removeItem("sessionid");
+            localStorage.removeItem("username");
             $(".page").hide();
             $("#bottomNavigation").hide();
             clearAllPages();
@@ -253,9 +360,6 @@ function logoutButtonClick(){
 function userProfile(username){
     $(".page").hide();
     $("#userProfile").show();
-    showBackButton(function(){
-        home();
-    });
     $("#userProfileWall").empty();
     $("#userProfileLoader").show();
 
@@ -336,6 +440,8 @@ function clearAllPages(){
     clearHomePage();
     clearUploadPage();
     clearSearchUserPage();
+    $(".tanso-nav-link").css("color","white");
+    $("#homeNavLink").css("color","#007bff");
 }
 
 function base64toSrc(imgBase64){
