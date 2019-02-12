@@ -44,38 +44,50 @@
         </form>
     </div>
     <!--HOME PAGE-->
-    <div id="home" class="page">
+    <div id="home" class="page" style="display:none;">
         <div id="homeLoader" class="loader" style="display:none;"></div>
         <ul id="wall" class="list-group" style="margin-bottom:60px;">
         </ul>
     </div>
     <!--UPLOAD PAGE-->
-    <div id="upload" class="page">
+    <div id="upload" class="page" style="display:none;">
         <div class="center" style="height: max-content; width: 300px;">
-            <img id="uploadImg" class="upload-image"/>
-            <button id="uploadImageButton" class="btn btn-primary mt-3 center-horizontal">Upload Image</button><br>
+            <button id="chooseImageButton" class="btn btn-primary center-horizontal">Choose Image</button>
+            <img id="uploadImg" class="upload-image mt-2"/>
+            <p id="uploadImgErrorTxt" class="mt-2" style="color:red; text-align:center;"></p>
+            <textarea id="uploadDescription" class="form-control" rows="3" placeholder="insert description" required></textarea>
+            <button id="createPostButton" disabled="true" class="btn btn-primary mt-2 center-horizontal">Create Post</button>
         </div>
     </div>
     <!--SEARCH USER PAGE-->
-    <div id="searchUser" class="page">
+    <div id="searchUser" class="page" style="display:none;">
         <input type="text" id="inputSearchUser" placeholder="search username" style="height: 35px; width: -webkit-fill-available; border: solid; border-color: lightgray; border-width: 1px; margin-top:2px; margin-left:2px; margin-right:2px;"/>
         <ul id="searchUserList" class="list-group" style="margin-bottom:60px;">
         </ul>
     </div>
     <!--MY PROFILE PAGE-->
-    <div id="myProfile" class="page">
+    <div id="myProfile" class="page" style="display:none;">
         <div id="myProfileLoader" class="loader" style="display:none;"></div>
         <ul id="myProfileWall" class="list-group" style="margin-bottom:60px;">
         </ul>
     </div>
     <!--USER PROFILE PAGE-->
-    <div id="userProfile" class="page">
+    <div id="userProfile" class="page" style="display:none;">
         <div id="userProfileLoader" class="loader" style="display:none;"></div>
         <ul id="userProfileWall" class="list-group" style="margin-bottom:60px;">
         </ul>
     </div>
+    <!--UPDATE PROFILE PICTURE PAGE-->
+    <div id="updateProfilePicture" class="page" style="display:none;">
+        <div class="center" style="height: max-content; width: 250px;">
+            <button id="choosePictureButton" class="btn btn-primary center-horizontal">Choose Image</button>
+            <img id="newProfilePictureImg" class="center-horizontal profile-picture mt-4" style="width:200px; height:200px"/>
+            <p id="updateProfilePictureErrorTxt" class="mt-2" style="color:red; text-align:center;"></p>
+            <button id="updateProfilePictureButton" disabled="true" class="btn btn-primary mt-2 center-horizontal">Update Picture</button>
+        </div>
+    </div>
     <!--NAVBAR-->
-    <nav id="bottomNavigation" class="nav fixed-bottom justify-content-around align-items-center" style="height:60px; background-color: black">
+    <nav id="bottomNavigation" class="nav fixed-bottom justify-content-around align-items-center" style="height:60px; background-color: black; display:none">
         <li>
             <a id="navHome" href="#">
                 <div>

@@ -18,7 +18,8 @@ function docReady(){
         $("#uploadNavLink").css("color","#007bff");
         upload();
     });
-    $("#uploadImageButton").on("click",uploadImage);
+    $("#chooseImageButton").on("click",chooseImage);
+    $("#createPostButton").on("click",createPost);
 
     $("#navSearchUser").on("click",function(){
         hideBackButton();
@@ -35,12 +36,16 @@ function docReady(){
         $("#myProfileNavLink").css("color","#007bff");
         myProfile();
     });
+    $(document).on("click","#editProfilePictureButton", updateProfilePicture);
+    $("#choosePictureButton").on("click", chooseProfilePicture);
+    $("#updateProfilePictureButton").on("click", updateProfilePictureCall);
     $(document).on("click",".home-post", homePostListener);
     $(document).on("click","#logoutButton", logoutButtonClick);
 
     $(document).on("click","#followButton", followButtonClick);
     $(document).on("click","#unfollowButton", unfollowButtonClick);
 
+    //Mostra il login o va alla home se c'è già un sessionid valido
     if(localStorage.getItem("username") && localStorage.getItem("sessionid")){
         let username = localStorage.getItem("username");
         let sessionid = localStorage.getItem("sessionid");
@@ -170,7 +175,7 @@ function makeHomePost(post){
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="font-size:14px">'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="white-space:pre-line; font-size:14px">'
     html += post.description;
     html += '</p>\n</div>\n</li>'
     return html;
@@ -180,6 +185,8 @@ function homePostListener(){
     let username = $(this).data("username");
     //Se il post è dell'utente loggato va a myProfile
     if(model.getInstance().getLoggedUser().uid == username){
+        $(".tanso-nav-link").css("color","white");
+        $("#myProfileNavLink").css("color","#007bff");
         myProfile();
     }
     //Altrimenti va a userProfile
@@ -202,22 +209,55 @@ function upload(){
     $("#upload").show();
 }
 
-function uploadImage(){
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
+function chooseImage(){
+    navigator.camera.getPicture(onUploadSuccess, onFail, { quality: 25,
     destinationType: Camera.DestinationType.DATA_URL, sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
     });
 }
 
-function onSuccess(imageData) {
-    $("#uploadImg").attr("src","data:image/jpeg;base64," + imageData);
+function onUploadSuccess(imageData) {
+    $("#uploadImgErrorTxt").text("");
+    $("#createPostButton").prop("disabled",true);
+    let base64 = ""+imageData;
+    $("#uploadImg").attr("src","data:image/jpeg;base64," + base64);
+    if(base64.length >= 102400){
+        $("#uploadImgErrorTxt").text("image size is too large ("+Math.round(base64.length/1024*100)/100+"KB)");
+    }
+    else {
+        $("#createPostButton").prop("disabled",false);
+    }
 }
 
 function onFail(message) {
-    console.log('uploadImage failed because: ' + message);
+    console.log('image load failed because: ' + message);
+}
+
+function createPost(){
+    let base64 = $("#uploadImg").attr("src");
+    base64 = base64.substring(23);
+    let descr = $("#uploadDescription").val();
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'img':base64, 'message':descr};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/create_post",
+        data: myData,
+        success: function(resultData){
+            clearUploadPage();
+            $(".tanso-nav-link").css("color","white");
+            $("#homeNavLink").css("color","#007bff");
+            home();
+        },
+        error: function(error){
+            console.log("error in create_post call: "+error);
+        }
+    });
 }
 
 function clearUploadPage(){
     $("#uploadImg").removeAttr("src");
+    $("#createPostButton").prop("disabled",true);
+    $("#uploadImgErrorTxt").text("");
+    $("#uploadDescription").val("");
 }
 
 /*********************************SEARCH USER**********************************/
@@ -238,6 +278,7 @@ function inputSearchUser(){
             data: myData,
             success: function(resultData){
                 json = JSON.parse(resultData);
+                $("#searchUserList").empty();
                 for(user of json.users){
                     let html = '<li data-username="'+user.name+'" class="search-user-list-item list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
                     if(!user.picture || user.picture == ""){
@@ -311,7 +352,7 @@ function myProfile(){
             let latestProfilePic = profileData.user.profilePicture;
             model.getInstance().getLoggedUser().profilePicture = latestProfilePic;
             let html = '<li class=border-bottom> <div class="row col-12 pb-3"> <img id="myProfilePicture" src="';
-            html += base64toSrc(model.getInstance().getLoggedUser().profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
+            html += base64toSrc(model.getInstance().getLoggedUser().profilePicture) + '" class="profile-picture ml-3 mt-3" style="height:100px; width:100px;"/> <img id="editProfilePictureButton" src="img/pencil.svg" style="margin-top:85px; margin-left:-25px; height:30px; width:30px;" class="profile-picture"> <div style="flex:1;"></div> <div class="d-flex align-items-center justify-content-center flex-column pt-3">';
             html += '<p>'+model.getInstance().getLoggedUser().uid+'</p>';
             html += '<button id="logoutButton" class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> <div style="flex:1;"></div> </div> </li>';
             $("#myProfileWall").append(html);
@@ -329,7 +370,7 @@ function makeProfilePost(post){
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="font-size:14px">'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="white-space:pre-line; font-size:14px">'
     html += post.description;
     html += '</p>\n</div>\n</li>'
     return html;
@@ -415,6 +456,61 @@ function unfollowButtonClick(){
     });
 }
 
+/****************************UPDATE PROFILE PICTURE****************************/
+function updateProfilePicture(){
+    $(".page").hide();
+    $("#updateProfilePicture").show();
+    showBackButton(function(){
+        clearUpdateProfilePicturePage();
+        myProfile();
+    });
+}
+
+function chooseProfilePicture(){
+    navigator.camera.getPicture(onPictureSuccess, onFail, { quality: 25,
+    destinationType: Camera.DestinationType.DATA_URL, sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+    });
+}
+
+function onPictureSuccess(imageData) {
+    $("#updateProfilePictureErrorTxt").text("");
+    $("#updateProfilePictureButton").prop("disabled",true);
+    let base64 = ""+imageData;
+    $("#newProfilePictureImg").attr("src","data:image/jpeg;base64," + base64);
+    if(base64.length >= 10240){
+        $("#updateProfilePictureErrorTxt").text("image size is too large ("+Math.round(base64.length/1024*100)/100+"KB)");
+    }
+    else {
+        $("#updateProfilePictureButton").prop("disabled",false);
+    }
+}
+
+function updateProfilePictureCall(){
+    let base64 = $("#newProfilePictureImg").attr("src");
+    base64 = base64.substring(23);
+    let myData = { 'session_id': model.getInstance().getLoggedUser().sessionid, 'picture':base64};
+    $.ajax({
+        type: 'POST',
+        url: "https://ewserver.di.unimi.it/mobicomp/fotogram/picture_update",
+        data: myData,
+        success: function(resultData){
+            clearUpdateProfilePicturePage();
+            $(".tanso-nav-link").css("color","white");
+            $("#myProfiNavLink").css("color","#007bff");
+            myProfile();
+        },
+        error: function(error){
+            console.log("error in picture_update call: "+error);
+        }
+    });
+}
+
+function clearUpdateProfilePicturePage(){
+    hideBackButton();
+    $("#newProfilePictureImg").removeAttr("src");
+    $("#updateProfilePictureButton").prop("disabled",true);
+}
+
 /********************************MISCELLANEOUS*********************************/
 
 // mostra il bottone indietro e gli assegna il comportamento
@@ -440,12 +536,13 @@ function clearAllPages(){
     clearHomePage();
     clearUploadPage();
     clearSearchUserPage();
+    clearUpdateProfilePicturePage();
     $(".tanso-nav-link").css("color","white");
     $("#homeNavLink").css("color","#007bff");
 }
 
 function base64toSrc(imgBase64){
-    if(imgBase64.substring(0,10) != "data:image")
+    if(imgBase64 != null && imgBase64.substring(0,10) != "data:image")
         return 'data:image/jpeg;base64,'+imgBase64;
     return imgBase64;
 }
