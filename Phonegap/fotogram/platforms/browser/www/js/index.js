@@ -167,7 +167,6 @@ function showWall(){
     });
 }
 
-//TODO: manca timestamp
 function makeHomePost(post){
     let html = '<li data-username="'+post.user.uid+'" class="home-post list-group-item pb-0 pt-2">\n<div style="height: 48px" class="row border-bottom pb-2 px-0">\n<img class="profile-picture" src="';
     html += base64toSrc(post.user.profilePicture);
@@ -175,9 +174,9 @@ function makeHomePost(post){
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="white-space:pre-line; font-size:14px">'
-    html += post.description;
-    html += '</p>\n</div>\n</li>'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0 mb-0" style="white-space:pre-line; font-size:14px">'
+    html += post.description+'</p>';
+    html += '<p class="mb-0" style="font-size:11px; color:grey;">'+getDateString(post.timestamp)+'</p>\n</div>\n</li>'
     return html;
 }
 
@@ -370,9 +369,9 @@ function makeProfilePost(post){
     html += post.user.uid;
     html += '</p>\n</div>\n<div class="row">\n<img class="col-12 px-0 h-100" src="'
     html += base64toSrc(post.picture);
-    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0" style="white-space:pre-line; font-size:14px">'
-    html += post.description;
-    html += '</p>\n</div>\n</li>'
+    html += '"/>\n</div>\n<div class="row">\n<p class="col-12 px-0 mb-0" style="white-space:pre-line; font-size:14px">'
+    html += post.description+'</p>';
+    html += '<p class="mb-0" style="font-size:11px; color:grey;">'+getDateString(post.timestamp)+'</p>\n</div>\n</li>'
     return html;
 }
 
@@ -545,4 +544,30 @@ function base64toSrc(imgBase64){
     if(imgBase64 != null && imgBase64.substring(0,10) != "data:image")
         return 'data:image/jpeg;base64,'+imgBase64;
     return imgBase64;
+}
+
+var monthNames = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+
+function getDateString(t){
+    var diff = new Date().getTime() - new Date(t).getTime();
+    var days = Math.floor(diff / (86400*1000));
+    if(days<=7) {
+        if (days >= 1) {
+            if (days == 1) return "YESTERDAY";
+            return days + " DAYS AGO";
+        }
+        var hours = Math.floor(diff / (3600 * 1000));
+        if (hours >= 1) {
+            if (hours == 1) return "AN HOUR AGO";
+            return hours + " HOURS AGO";
+        }
+        var minutes = Math.floor(diff / (60 * 1000));
+        if (minutes >= 1) {
+            if (minutes == 1) return "A MINUTE AGO";
+            return minutes + " MINUTES AGO";
+        }
+        return "MOMENTS AGO";
+    }
+    var date = new Date(t);
+    return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
 }
