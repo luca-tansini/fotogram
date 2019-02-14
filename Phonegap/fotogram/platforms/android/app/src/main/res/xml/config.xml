@@ -76,4 +76,5 @@
     <preference name="loglevel" value="DEBUG" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="16" />
+    <preference name="orientation" value="portrait" />
 </widget>

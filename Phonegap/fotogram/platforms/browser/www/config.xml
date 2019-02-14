@@ -17,4 +17,5 @@
     <allow-intent href="geo:*" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="16" />
+    <preference name="orientation" value="portrait" />
 </widget>
