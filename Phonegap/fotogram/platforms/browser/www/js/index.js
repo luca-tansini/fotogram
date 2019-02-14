@@ -157,9 +157,11 @@ function showWall(){
                     wall.push(new Post(model.getInstance().getLoggedUser().getFollowing()[post.user], post.img, post.msg, post.timestamp));
             }
             $("#homeLoader").hide();
-            for(post of wall){
-                $("#wall").append(makeHomePost(post));
-            }
+            if(wall.length > 0)
+                for(post of wall)
+                    $("#wall").append(makeHomePost(post));
+            else
+                $("#wall").append('<p style="color:grey; font-size:24px; margin-top:80px; margin-left:20px; margin-right:10px" >it\'s all quiet in here, go follow some friends or upload your own post!</p>');
         },
         error: function(error){
             console.log("error in followed call: "+error);
@@ -356,9 +358,11 @@ function myProfile(){
             html += '<button id="logoutButton" class="btn btn-primary" style="background-color: red; color: black; border: none; width: 100px; height: 30px;">logout</button> </div> <div style="flex:1;"></div> </div> </li>';
             $("#myProfileWall").append(html);
             $("#myProfileLoader").hide();
-            for(post of profileData.userwall){
-                $("#myProfileWall").append(makeProfilePost(post));
-            }
+            if(profileData.userwall.length > 0)
+                for(post of profileData.userwall)
+                    $("#myProfileWall").append(makeProfilePost(post));
+            else
+                $("#myProfileWall").append('<p style="color:grey; font-size:24px; margin-top:80px; margin-left:20px; margin-right:10px" >This looks empty, go create your first post!</p>');
         });
 }
 

@@ -17,8 +17,8 @@
 .home-post{}
 
 .upload-image{
-    height:300px;
-    width:300px;
+    height:280px;
+    width:280px;
     object-position: center;
     object-fit: contain;
 }
