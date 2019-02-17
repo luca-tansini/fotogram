@@ -304,6 +304,8 @@ function inputSearchUser(){
 function searchUserListener(){
     let username = $(this).data("username");
     if(username == model.getInstance().getLoggedUser().uid){
+        $(".tanso-nav-link").css("color","white");
+        $("#myProfileNavLink").css("color","#007bff");
         myProfile();
     }
     else{
